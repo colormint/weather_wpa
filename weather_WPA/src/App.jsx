@@ -150,7 +150,7 @@ function App() {
 
       <footer className="text-center text-mute mt-4 pb-8 text-xs flex flex-col gap-2">
         <span>Weather data by <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" className="underline font-medium decoration-slice">Open-Meteo.com</a> & <a href="https://www.rainviewer.com/" target="_blank" rel="noopener noreferrer" className="underline font-medium decoration-slice">RainViewer</a></span>
-        <span className="opacity-80">made by <a href="https://github.com/colormint" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--accent-blue)] transition-colors font-semibold">colomint</a></span>
+        <span className="opacity-80">made by <a href="https://github.com/colormint" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--accent-blue)] transition-colors font-semibold">colormint</a></span>
       </footer>
     </div>
   );

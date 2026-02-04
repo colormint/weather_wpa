@@ -26,26 +26,29 @@ const getWeatherIcon = (code, isDay) => {
 
 const CurrentWeather = ({ temperature, weatherCode, isDay, feelsLike, high, low }) => {
     return (
-        <div className="card current-weather">
-            <div className="weather-icon">
-                {getWeatherIcon(weatherCode, isDay)}
-            </div>
-            <div className="flex flex-col items-center">
-                <h1 className="text-gradient weather-temp">
-                    {Math.round(temperature)}°
-                </h1>
-                <p className="weather-desc">
-                    {weatherCode === 0 ? "Clear" :
-                        weatherCode <= 3 ? "Cloudy" :
-                            weatherCode <= 65 ? "Rain" : "Storm"}
-                </p>
-                <div className="flex gap-4 mt-2 text-[var(--text-secondary)] font-medium">
-                    <span>H: {Math.round(high)}°</span>
-                    <span>L: {Math.round(low)}°</span>
+        <div className="w-full">
+            <h2 className="text-lg font-bold mb-4 ml-1">Overview</h2>
+            <div className="card current-weather">
+                <div className="weather-icon">
+                    {getWeatherIcon(weatherCode, isDay)}
                 </div>
-                <p className="text-sm text-[var(--text-secondary)] mt-1">
-                    Feels like {Math.round(feelsLike)}°
-                </p>
+                <div className="flex flex-col items-center">
+                    <h1 className="text-gradient weather-temp">
+                        {Math.round(temperature)}°
+                    </h1>
+                    <p className="weather-desc">
+                        {weatherCode === 0 ? "Clear" :
+                            weatherCode <= 3 ? "Cloudy" :
+                                weatherCode <= 65 ? "Rain" : "Storm"}
+                    </p>
+                    <div className="flex gap-4 mt-2 text-[var(--text-secondary)] font-medium">
+                        <span>H: {Math.round(high)}°</span>
+                        <span>L: {Math.round(low)}°</span>
+                    </div>
+                    <p className="text-sm text-[var(--text-secondary)] mt-1">
+                        Feels like {Math.round(feelsLike)}°
+                    </p>
+                </div>
             </div>
         </div>
     );

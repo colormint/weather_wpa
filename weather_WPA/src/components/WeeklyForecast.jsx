@@ -6,6 +6,17 @@ const DailyCard = ({ day }) => {
     const dayName = format(date, 'EEEE');
     const fullDate = format(date, 'MMM d');
 
+    // Get condition text based on code (simplified)
+    const getConditionText = (code) => {
+        if (code === 0) return "Clear";
+        if (code <= 3) return "Cloudy";
+        if (code <= 48) return "Fog";
+        if (code <= 67) return "Rain";
+        if (code <= 77) return "Snow";
+        if (code <= 99) return "Storm";
+        return "Unknown";
+    };
+
     const getIcon = (code) => {
         if (code === 0) return "☀️";
         if (code <= 3) return "☁️";
@@ -17,12 +28,14 @@ const DailyCard = ({ day }) => {
     }
 
     return (
-        <div className="day-card justify-between py-6 min-h-[220px]">
+        <div className="day-card justify-between py-6 min-h-[260px]">
+            {/* Header: Date */}
             <div className="flex flex-col items-center">
                 <span className="font-bold text-lg text-[var(--text-primary)]">{dayName}</span>
                 <span className="text-[var(--text-secondary)] text-xs font-medium uppercase tracking-wide opacity-80">{fullDate}</span>
             </div>
 
+            {/* Main Content: Icon & Temp */}
             <div className="flex flex-col items-center gap-1 my-2">
                 <div className="text-6xl filter drop-shadow-sm mb-2">
                     {getIcon(day.code)}
@@ -30,21 +43,20 @@ const DailyCard = ({ day }) => {
                 <span className="text-4xl font-bold text-[var(--text-primary)] tracking-tight">
                     {Math.round((day.max + day.min) / 2)}°
                 </span>
-                <span className="text-xs text-[var(--text-secondary)] font-medium">
-                    Feels {Math.round((day.apparentMax + day.apparentMin) / 2)}°
+                <span className="text-sm font-medium text-[var(--text-secondary)]">
+                    {getConditionText(day.code)}
                 </span>
             </div>
 
-            <div className="flex items-center gap-3 text-sm font-semibold w-full justify-center">
-                <div className="flex flex-col items-center">
-                    <span className="text-[var(--text-secondary)] text-[10px] uppercase">Low</span>
-                    <span className="text-[var(--accent-blue)]">{Math.round(day.min)}°</span>
+            {/* Footer: H/L & Feels Like */}
+            <div className="flex flex-col items-center gap-2 w-full">
+                <div className="flex gap-4 text-sm font-semibold">
+                    <span className="text-[var(--text-secondary)]">H: {Math.round(day.max)}°</span>
+                    <span className="text-[var(--text-secondary)]">L: {Math.round(day.min)}°</span>
                 </div>
-                <div className="h-6 w-px bg-[var(--divider-color)]"></div>
-                <div className="flex flex-col items-center">
-                    <span className="text-[var(--text-secondary)] text-[10px] uppercase">High</span>
-                    <span className="text-[var(--accent-danger)]">{Math.round(day.max)}°</span>
-                </div>
+                <span className="text-xs text-[var(--text-secondary)] font-medium">
+                    Feels like {Math.round((day.apparentMax + day.apparentMin) / 2)}°
+                </span>
             </div>
         </div>
     );

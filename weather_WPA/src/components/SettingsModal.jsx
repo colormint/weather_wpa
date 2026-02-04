@@ -22,10 +22,13 @@ const SettingsModal = ({ onClose }) => {
 
     return (
         <div className="modal-overlay">
-            <div className="card modal-content p-6 flex-col gap-6">
-                <div className="flex justify-between items-center relative pl-2">
+            <div className="card modal-content p-6 flex-col gap-6 relative">
+                <div className="flex justify-between items-center pl-2 mt-2">
                     <h2 className="text-2xl font-bold">Settings</h2>
-                    <button onClick={onClose} className="icon-btn absolute right-0 top-1/2 -translate-y-1/2">
+                    <button
+                        onClick={onClose}
+                        className="icon-btn absolute top-4 right-4"
+                    >
                         <X size={24} />
                     </button>
                 </div>

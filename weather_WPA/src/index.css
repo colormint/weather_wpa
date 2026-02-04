@@ -1,0 +1,575 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+
+:root {
+  /* Default Light Mode - Clean White */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  /* Very light gray */
+  --text-primary: #111827;
+  /* Near black */
+  --text-secondary: #6b7280;
+  /* Gray */
+  --divider-color: #e5e7eb;
+
+  --accent-blue: #2563eb;
+  --accent-cyan: #0891b2;
+  --accent-yellow: #ca8a04;
+  --accent-danger: #dc2626;
+  --accent-success: #16a34a;
+
+  --font-sans: 'Pretendard', 'Inter', system-ui, -apple-system, sans-serif;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+}
+
+/* Dark Mode Overrides - Gray/Black */
+body.dark {
+  --bg-primary: #000000;
+  /* Pure Black */
+  --bg-secondary: #18181b;
+  /* Zinc 900 */
+  --text-primary: #f9fafb;
+  --text-secondary: #9ca3af;
+  --divider-color: #27272a;
+
+  --accent-blue: #60a5fa;
+  --accent-cyan: #22d3ee;
+  --accent-yellow: #facc15;
+  --accent-danger: #f87171;
+  --accent-success: #4ade80;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+#root {
+  max-width: 480px;
+  /* Strict mobile width */
+  margin: 0 auto;
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  padding-bottom: var(--spacing-xl);
+}
+
+/* Layout Utilities */
+.container {
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.card {
+  background-color: var(--bg-secondary);
+  border-radius: 1.5rem;
+  padding: var(--spacing-lg);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+}
+
+.center {
+  align-items: center;
+  justify-content: center;
+}
+
+.between {
+  justify-content: space-between;
+}
+
+.gap-sm {
+  gap: var(--spacing-sm);
+}
+
+.gap-md {
+  gap: var(--spacing-md);
+}
+
+.gap-lg {
+  gap: var(--spacing-lg);
+}
+
+/* Typography */
+h1,
+h2,
+h3 {
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.text-gradient {
+  background: linear-gradient(to right, var(--accent-cyan), var(--accent-blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-mute {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+/* Header */
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+  padding: var(--spacing-sm) 0;
+}
+
+/* Component: Current Weather */
+.current-weather {
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-xl) 0;
+}
+
+.weather-icon {
+  font-size: 5rem;
+  animation: bounce-slow 3s infinite;
+}
+
+.weather-temp {
+  font-size: 4.5rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.weather-desc {
+  font-size: 1.25rem;
+  text-transform: capitalize;
+  color: var(--text-secondary);
+}
+
+@keyframes bounce-slow {
+
+  0%,
+  100% {
+    transform: translateY(-5%);
+  }
+
+  50% {
+    transform: translateY(5%);
+  }
+}
+
+/* Component: Precipitation */
+.precip-title {
+  font-size: 1.125rem;
+  color: var(--accent-blue);
+  margin-bottom: var(--spacing-md);
+}
+
+.chart-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 120px;
+  gap: 4px;
+}
+
+.chart-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.chart-bar-bg {
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-primary);
+  /* darker track */
+  border-radius: 8px 8px 0 0;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+}
+
+.chart-bar-fill {
+  width: 100%;
+  background-color: var(--accent-blue);
+  opacity: 0.8;
+  transition: height 0.5s ease;
+}
+
+.chart-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+}
+
+/* Component: Air Quality */
+.aqi-title {
+  font-size: 1.125rem;
+  color: var(--accent-cyan);
+  margin-bottom: var(--spacing-lg);
+}
+
+.aqi-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+
+.aqi-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.aqi-value {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.divider {
+  width: 1px;
+  height: 40px;
+  background-color: var(--bg-primary);
+}
+
+/* Component: Sun Cycle */
+.sun-title {
+  font-size: 1.125rem;
+  color: var(--accent-yellow);
+  margin-bottom: var(--spacing-lg);
+}
+
+.sun-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+
+.sun-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sun-time {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* Component: Radar */
+.radar-wrapper {
+  height: 350px;
+  /* Explicit height fixed */
+  width: 100%;
+  border-radius: 1rem;
+  overflow: hidden;
+  position: relative;
+  /* Reset padding from card if we want edge-to-edge, but card padding is nice */
+}
+
+/* Leaflet Overrides */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.radar-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  z-index: 1000;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--divider-color);
+  border-radius: 99px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* Utilities */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Dark Mode Link Override */
+body.dark a {
+  color: #60a5fa;
+  /* Default blue */
+}
+
+body.dark a:hover {
+  color: #93c5fd;
+}
+
+/* Material Utilities */
+.input-flat {
+  background-color: var(--bg-secondary);
+  border: 1px solid transparent;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 9999px;
+  color: var(--text-primary);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.input-flat:focus {
+  background-color: var(--bg-primary);
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+  outline: none;
+}
+
+.radio-option.active {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.radio-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.radio-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+
+.radio-item:hover {
+  border-color: var(--divider-color);
+}
+
+.radio-item.active {
+  background-color: var(--bg-primary);
+  border-color: var(--accent-blue);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+}
+
+.radio-circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--text-secondary);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.radio-item.active .radio-circle {
+  border-color: var(--accent-blue);
+}
+
+.radio-item.active .radio-circle::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  background-color: var(--accent-blue);
+  border-radius: 50%;
+}
+
+.backdrop-blur {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+button.close-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  width: 32px;
+  height: 32px;
+}
+
+button.close-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--text-primary);
+}
+
+.radio-group {
+  display: flex;
+  gap: 0.5rem;
+  background-color: var(--bg-secondary);
+  padding: 0.25rem;
+  border-radius: 9999px;
+}
+
+.radio-option {
+  flex: 1;
+  text-align: center;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-secondary);
+}
+
+/* Layout Polyfills (Replaces missing Tailwind) */
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-lg);
+}
+
+@media (min-width: 768px) {
+  .grid-2 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Carousel / Swipe */
+.carousel-container {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: var(--spacing-md);
+  scroll-snap-type: x mandatory;
+  width: 100%;
+  padding-bottom: var(--spacing-sm);
+  -webkit-overflow-scrolling: touch;
+}
+
+.day-card {
+  min-width: 180px;
+  width: 180px;
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  background-color: var(--bg-secondary);
+  border-radius: 1.5rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid var(--divider-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s;
+}
+
+.day-card:hover {
+  transform: scale(1.02);
+}
+
+/* Button & Input Resets */
+button:focus,
+input:focus {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+button.icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  color: var(--text-secondary);
+  transition: color 0.2s, background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button.icon-btn:hover {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.hidden {
+  display: none !important;
+}

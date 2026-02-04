@@ -48,7 +48,7 @@ const Header = () => {
                 {/* Row 1: Title and Settings */}
                 <div className="flex w-full justify-between items-center px-1">
                     <h1 className="header-title">
-                        Simple Weather <span className="text-secondary font-medium text-sm">v0.0.9.2</span>
+                        Simple Weather <span className="text-secondary font-medium text-sm">v0.0.9.4</span>
                     </h1>
                     <button
                         onClick={() => setShowSettings(true)}

@@ -36,25 +36,25 @@ const DailyCard = ({ day }) => {
             </div>
 
             {/* Main Content: Icon & Temp */}
-            <div className="flex flex-col items-center gap-1 my-2">
-                <div className="text-6xl filter drop-shadow-sm mb-2">
+            <div className="flex flex-col items-center gap-2 my-4">
+                <div className="text-7xl filter drop-shadow-sm mb-2">
                     {getIcon(day.code)}
                 </div>
-                <span className="text-4xl font-bold text-[var(--text-primary)] tracking-tight">
+                <span className="text-5xl font-extrabold text-[var(--text-primary)] tracking-tighter">
                     {Math.round((day.max + day.min) / 2)}°
                 </span>
-                <span className="text-sm font-medium text-[var(--text-secondary)]">
+                <span className="text-base font-bold text-[var(--text-secondary)]">
                     {getConditionText(day.code)}
                 </span>
             </div>
 
             {/* Footer: H/L & Feels Like */}
             <div className="flex flex-col items-center gap-2 w-full">
-                <div className="flex gap-4 text-sm font-semibold">
+                <div className="flex gap-4 text-base font-bold">
                     <span className="text-[var(--text-secondary)]">H: {Math.round(day.max)}°</span>
                     <span className="text-[var(--text-secondary)]">L: {Math.round(day.min)}°</span>
                 </div>
-                <span className="text-xs text-[var(--text-secondary)] font-medium">
+                <span className="text-sm text-[var(--text-secondary)] font-semibold">
                     Feels like {Math.round((day.apparentMax + day.apparentMin) / 2)}°
                 </span>
             </div>
@@ -77,7 +77,7 @@ const WeeklyForecast = ({ daily }) => {
 
     return (
         <div className="card w-full">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex justify-between items-center mb-8">
                 <h2 className="text-lg font-bold">7-Day Forecast</h2>
             </div>
             <div className="carousel-container pb-4">

@@ -23,19 +23,28 @@ const DailyCard = ({ day }) => {
                 <span className="text-[var(--text-secondary)] text-xs font-medium uppercase tracking-wide opacity-80">{fullDate}</span>
             </div>
 
-            <div className="flex flex-col items-center gap-4">
-                <div className="text-7xl filter drop-shadow-sm my-1">
+            <div className="flex flex-col items-center gap-1 my-2">
+                <div className="text-6xl filter drop-shadow-sm mb-2">
                     {getIcon(day.code)}
                 </div>
-                <span className="text-5xl font-bold text-[var(--text-primary)] tracking-tight">
+                <span className="text-4xl font-bold text-[var(--text-primary)] tracking-tight">
                     {Math.round((day.max + day.min) / 2)}°
+                </span>
+                <span className="text-xs text-[var(--text-secondary)] font-medium">
+                    Feels {Math.round((day.apparentMax + day.apparentMin) / 2)}°
                 </span>
             </div>
 
-            <div className="flex items-center gap-2 text-sm font-medium opacity-80">
-                <span className="text-[var(--accent-danger)]">{Math.round(day.max)}°</span>
-                <span className="text-[var(--text-secondary)]">/</span>
-                <span className="text-[var(--accent-blue)]">{Math.round(day.min)}°</span>
+            <div className="flex items-center gap-3 text-sm font-semibold w-full justify-center">
+                <div className="flex flex-col items-center">
+                    <span className="text-[var(--text-secondary)] text-[10px] uppercase">Low</span>
+                    <span className="text-[var(--accent-blue)]">{Math.round(day.min)}°</span>
+                </div>
+                <div className="h-6 w-px bg-[var(--divider-color)]"></div>
+                <div className="flex flex-col items-center">
+                    <span className="text-[var(--text-secondary)] text-[10px] uppercase">High</span>
+                    <span className="text-[var(--accent-danger)]">{Math.round(day.max)}°</span>
+                </div>
             </div>
         </div>
     );
@@ -44,17 +53,19 @@ const DailyCard = ({ day }) => {
 const WeeklyForecast = ({ daily }) => {
     if (!daily) return null;
 
-    // daily: { time: [], weather_code: [], temperature_2m_max: [], temperature_2m_min: [] }
+    // daily: { time: [], weather_code: [], temperature_2m_max: [], temperature_2m_min: [], apparent_temperature_max: [], apparent_temperature_min: [] }
     const days = daily.time.map((t, i) => ({
         time: t,
         code: daily.weather_code[i],
         max: daily.temperature_2m_max[i],
-        min: daily.temperature_2m_min[i]
+        min: daily.temperature_2m_min[i],
+        apparentMax: daily.apparent_temperature_max ? daily.apparent_temperature_max[i] : daily.temperature_2m_max[i],
+        apparentMin: daily.apparent_temperature_min ? daily.apparent_temperature_min[i] : daily.temperature_2m_min[i]
     }));
 
     return (
-        <div className="card">
-            <div className="flex justify-between items-center mb-8">
+        <div className="card w-full">
+            <div className="flex justify-between items-center mb-6">
                 <h2 className="text-lg font-bold">7-Day Forecast</h2>
             </div>
             <div className="carousel-container pb-4">

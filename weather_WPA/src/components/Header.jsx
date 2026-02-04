@@ -44,49 +44,52 @@ const Header = () => {
 
     return (
         <>
-            <header className="app-header max-w-full px-4 pt-4 pb-2 z-50">
-                <div className="flex items-center gap-3 w-full relative">
-                    {/* Search Icon */}
-                    <Search size={20} className="text-[var(--text-secondary)] flex-shrink-0" />
+            <header className="app-header w-full px-4 pt-4 pb-2 z-50 flex-col gap-4">
+                {/* Row 1: Title and Settings */}
+                <div className="flex w-full justify-between items-center px-1">
+                    <h1 className="header-title">
+                        Simple Weather <span className="text-secondary font-medium text-sm">v0.0.9.2</span>
+                    </h1>
+                    <button
+                        onClick={() => setShowSettings(true)}
+                        className="icon-btn"
+                    >
+                        <Settings size={22} />
+                    </button>
+                </div>
 
-                    {/* Search Input */}
-                    <div className="flex-1 relative">
+                {/* Row 2: Search Bar */}
+                <div className="w-full relative">
+                    <div className="search-container">
+                        <Search size={18} className="text-[var(--text-secondary)] flex-shrink-0" />
                         <input
                             type="text"
                             placeholder={location ? location.name : "Search City..."}
-                            className="w-full bg-transparent text-[var(--text-primary)] font-bold text-lg placeholder:text-[var(--text-secondary)] placeholder:font-normal focus:outline-none"
+                            className="header-input"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onFocus={() => { if (results.length > 0) setShowResults(true); }}
                         />
-
-                        {/* Dropdown Results */}
-                        {showResults && results.length > 0 && (
-                            <div className="absolute top-full left-0 right-0 mt-4 bg-[var(--bg-primary)] rounded-xl shadow-xl border border-[var(--divider-color)] overflow-hidden z-[60]">
-                                {results.map((res) => (
-                                    <button
-                                        key={res.id}
-                                        onClick={() => handleSelect(res)}
-                                        className="w-full text-left px-4 py-3 hover:bg-[var(--bg-secondary)] flex items-center gap-2 border-b border-[var(--divider-color)] last:border-none"
-                                    >
-                                        <MapPin size={14} className="text-[var(--accent-blue)]" />
-                                        <div>
-                                            <span className="font-bold text-sm block text-[var(--text-primary)]">{res.name}</span>
-                                            <span className="text-xs text-[var(--text-secondary)]">{res.admin1 ? `${res.admin1}, ` : ''}{res.country}</span>
-                                        </div>
-                                    </button>
-                                ))}
-                            </div>
-                        )}
                     </div>
 
-                    {/* Settings Icon */}
-                    <button
-                        onClick={() => setShowSettings(true)}
-                        className="icon-btn flex-shrink-0"
-                    >
-                        <Settings size={24} />
-                    </button>
+                    {/* Dropdown Results */}
+                    {showResults && results.length > 0 && (
+                        <div className="dropdown-menu">
+                            {results.map((res) => (
+                                <button
+                                    key={res.id}
+                                    onClick={() => handleSelect(res)}
+                                    className="dropdown-item"
+                                >
+                                    <MapPin size={16} className="text-[var(--accent-blue)] flex-shrink-0" />
+                                    <div className="flex-col items-start gap-1">
+                                        <span className="font-bold text-sm block text-[var(--text-primary)] leading-tight">{res.name}</span>
+                                        <span className="text-xs text-[var(--text-secondary)] leading-tight">{res.admin1 ? `${res.admin1}, ` : ''}{res.country}</span>
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </header>
 

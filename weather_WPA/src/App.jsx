@@ -56,8 +56,8 @@ function App() {
 
         // API 1: Weather (Expanded for Forecasts)
         // hourly: temp, code
-        // daily: max/min, sunrise/sunset
-        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${location.lat}&longitude=${location.lon}&current=temperature_2m,weather_code,is_day,apparent_temperature&minutely_15=precipitation&hourly=temperature_2m,weather_code,precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=auto&forecast_days=7&models=best_match${unitParam}`;
+        // daily: max/min, sunrise/sunset, apparent_temperature_max, apparent_temperature_min
+        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${location.lat}&longitude=${location.lon}&current=temperature_2m,weather_code,is_day,apparent_temperature&minutely_15=precipitation&hourly=temperature_2m,weather_code,precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,apparent_temperature_max,apparent_temperature_min&timezone=auto&forecast_days=7&models=best_match${unitParam}`;
 
         // API 2: Air Quality
         const aqUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${location.lat}&longitude=${location.lon}&current=pm10,pm2_5&hourly=pm10,pm2_5&timezone=auto`;
@@ -142,17 +142,11 @@ function App() {
 
       <WeeklyForecast daily={daily} />
 
-      <div className="grid-2">
-        <SunCycle
-          sunrise={daily.sunrise[0]}
-          sunset={daily.sunset[0]}
-        />
-        {/* Placeholder for future component or just SunCycle full width if grid-2 is not appropriate,
-            but request was to move AQI. I'll put AQI above and maybe leave SunCycle alone or paired with something else.
-            Request: "AirQuality below 24h forecast". done.
-            "Rearrange boxes".
-        */}
-      </div>
+      {/* SunCycle Full Width */}
+      <SunCycle
+        sunrise={daily.sunrise[0]}
+        sunset={daily.sunset[0]}
+      />
 
       <footer className="text-center text-mute mt-4 pb-8 text-xs">
         Weather data by <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" className="underline font-medium decoration-slice">Open-Meteo.com</a> & <a href="https://www.rainviewer.com/" target="_blank" rel="noopener noreferrer" className="underline font-medium decoration-slice">RainViewer</a>

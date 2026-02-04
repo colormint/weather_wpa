@@ -25,7 +25,7 @@ const AirQuality = ({ pm10, pm25 }) => {
     return (
         <div className="card">
             <h2 className="text-lg font-bold mb-4 text-[var(--text-primary)]">Air Quality</h2>
-            <div className="grid grid-cols-2 gap-8 relative items-center justify-items-center">
+            <div className="grid-cols-2 relative items-center justify-items-center">
                 <div className="flex flex-col items-center">
                     <span className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-1">PM10</span>
                     <span className="text-3xl font-bold" style={{ color: getAQIColor(pm10) }}>{pm10}</span>

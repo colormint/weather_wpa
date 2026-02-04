@@ -54,7 +54,7 @@ const HourlyForecast = ({ hourly }) => {
     };
 
     return (
-        <div className="card overflow-hidden max-w-[90vw] md:max-w-full mx-auto">
+        <div className="card overflow-hidden w-full">
             <h2 className="text-lg font-bold mb-4">24h Forecast</h2>
             {/* Wrapper to isolate scrollbar logic inside the card */}
             <div className="w-full overflow-hidden">

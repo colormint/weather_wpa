@@ -21,12 +21,12 @@ const SettingsModal = ({ onClose }) => {
     );
 
     return (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-            <div className="card w-full max-w-sm p-6 shadow-2xl relative bg-[var(--bg-primary)] border border-[var(--divider-color)]">
-                <div className="flex justify-between items-center mb-6 pl-8 relative">
-                    <h2 className="text-xl font-bold text-center w-full">Settings</h2>
-                    <button onClick={onClose} className="close-btn absolute left-0">
-                        <X size={20} />
+        <div className="modal-overlay">
+            <div className="card modal-content p-6 flex-col gap-6">
+                <div className="flex justify-between items-center relative pl-2">
+                    <h2 className="text-2xl font-bold">Settings</h2>
+                    <button onClick={onClose} className="icon-btn absolute right-0 top-1/2 -translate-y-1/2">
+                        <X size={24} />
                     </button>
                 </div>
 

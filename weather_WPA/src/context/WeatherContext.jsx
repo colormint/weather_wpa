@@ -15,7 +15,21 @@ export const WeatherProvider = ({ children }) => {
     const [timeFormat, setTimeFormat] = useState(() => localStorage.getItem('weather-time-format') || '12h');
 
     // Location: { lat, lon, name }
-    const [location, setLocation] = useState(null);
+    const [location, setLocation] = useState(() => {
+        try {
+            const saved = localStorage.getItem('weather-location');
+            return saved ? JSON.parse(saved) : null;
+        } catch (e) {
+            console.error("Failed to parse location", e);
+            return null;
+        }
+    });
+
+    useEffect(() => {
+        if (location) {
+            localStorage.setItem('weather-location', JSON.stringify(location));
+        }
+    }, [location]);
 
     useEffect(() => {
         const root = window.document.body;

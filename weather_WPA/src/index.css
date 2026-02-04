@@ -25,20 +25,32 @@
 }
 
 /* Dark Mode Overrides - Gray/Black */
-body.dark {
-  --bg-primary: #000000;
-  /* Pure Black */
-  --bg-secondary: #18181b;
-  /* Zinc 900 */
-  --text-primary: #f9fafb;
+/* Dark Mode Theme */
+.dark {
+  --bg-primary: #121212;
+  /* Neutral Black */
+  --bg-secondary: #1e1e1e;
+  /* Neutral Dark Gray */
+  --card-bg: #252525;
+  /* Neutral Gray */
+  --text-primary: #f3f4f6;
   --text-secondary: #9ca3af;
-  --divider-color: #27272a;
-
   --accent-blue: #60a5fa;
   --accent-cyan: #22d3ee;
+  --divider-color: #404040;
+  /* Neutral Divider */
   --accent-yellow: #facc15;
   --accent-danger: #f87171;
   --accent-success: #4ade80;
+}
+
+/* Add depth to cards in dark mode */
+.dark .card {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.7), 0 2px 4px -1px rgba(0, 0, 0, 0.5);
+}
+
+.dark .modal-content {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.8);
 }
 
 * {

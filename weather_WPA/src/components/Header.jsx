@@ -48,6 +48,7 @@ const Header = () => {
     };
 
     const handleGeoLocation = () => {
+        setSearchQuery(''); // Clear any existing search text to ensure placeholder shows
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(async (position) => {
                 const lat = position.coords.latitude;
@@ -60,7 +61,10 @@ const Header = () => {
 
                     let displayName = "Current Location";
                     if (result) {
-                        displayName = `📍 ${result.name}, ${result.country}`;
+                        displayName = `📍 ${result.name}, ${result.country} (Current Location)`;
+                    } else {
+                        // Fallback but still try to be descriptive if possible or just stick to format
+                        displayName = "📍 Current Location";
                     }
 
                     setLocation({
@@ -93,7 +97,7 @@ const Header = () => {
                 {/* Row 1: Title and Settings */}
                 <div className="flex w-full justify-between items-center px-1">
                     <h1 className="header-title">
-                        Simple Weather <span className="text-secondary font-medium text-sm">v0.1.0</span>
+                        Simple Weather <span className="text-secondary font-medium text-sm">v0.0.9.3</span>
                     </h1>
                     <div className="flex gap-2">
                         <button
@@ -118,6 +122,12 @@ const Header = () => {
                         <Search size={18} className="text-[var(--text-secondary)] flex-shrink-0" />
                         <input
                             type="text"
+                            // If location exists use it, otherwise placeholder.
+                            // BUT: If user is typing code needs to handle value.
+                            // The value prop is searchQuery.
+                            // If searchQuery is empty, we want to show the current location name as placeholder?
+                            // Or should we set the searchQuery to the name?
+                            // Standard pattern: Placeholder shows current context, Input shows user query.
                             placeholder={location ? location.name : "Search City..."}
                             className="header-input"
                             value={searchQuery}

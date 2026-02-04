@@ -56,12 +56,12 @@ const HourlyForecast = ({ hourly }) => {
     };
 
     const getWeatherText = (code) => {
-        if (code === 0) return "Clear";
-        if (code <= 3) return "Cloudy";
-        if (code <= 48) return "Fog";
-        if (code <= 67) return "Rain";
-        if (code <= 77) return "Snow";
-        if (code <= 99) return "Storm";
+        if (code === 0) return "☀️ Clear";
+        if (code <= 3) return "☁️ Cloudy";
+        if (code <= 48) return "🌫️ Fog";
+        if (code <= 67) return "🌧️ Rain";
+        if (code <= 77) return "❄️ Snow";
+        if (code <= 99) return "⛈️ Storm";
         return "";
     };
 
@@ -95,14 +95,14 @@ const HourlyForecast = ({ hourly }) => {
                     <div style={{ width: `${width}px` }} className="relative flex flex-col justify-between">
 
                         {/* Row 1: Condition Text */}
-                        <div className="flex w-full h-6 relative mb-4">
+                        <div className="flex w-full h-8 relative mb-4">
                             {hours.map((h, i) => {
                                 if (i % 3 !== 0 && i !== 0) return null;
                                 const text = getWeatherText(h.code);
                                 return (
                                     <span
                                         key={`cond-${i}`}
-                                        className="absolute text-xs text-[var(--text-secondary)] font-medium text-center transform -translate-x-1/2"
+                                        className="absolute text-sm text-[var(--text-secondary)] font-medium text-center transform -translate-x-1/2 whitespace-nowrap"
                                         style={{ left: i * itemWidth + itemWidth / 2 }}
                                     >
                                         {text}
@@ -137,9 +137,10 @@ const HourlyForecast = ({ hourly }) => {
                                             stroke="var(--divider-color)"
                                             strokeDasharray="6 4"
                                             strokeWidth="1.5"
-                                            opacity="0.7"
+                                            opacity="0.8"
                                         />
-                                        <text x={10} y={yZero - 4} fontSize="12">❄️</text>
+                                        {/* Adjusted Ice Emoji Position: Snowflake, Small, Left */}
+                                        <text x={0} y={yZero + 4} fontSize="14">❄️</text>
                                     </g>
                                 )}
 
@@ -154,29 +155,48 @@ const HourlyForecast = ({ hourly }) => {
                                         stroke="var(--divider-color)"
                                         strokeDasharray="4 4"
                                         strokeWidth="1"
-                                        opacity="0.3"
+                                        opacity="0.5"
                                     />
                                 ))}
 
                                 {/* Precipitation Bars */}
                                 {hours.map((h, i) => {
                                     const prob = h.pop || 0;
-                                    if (prob === 0) return null;
-                                    const barHeight = (prob / 100) * precipMaxHeight;
+                                    // Always render bar frame or text for 0%
+                                    // If 0, min height for visual or just text? 
+                                    // User said "put percentage even on 0% precipitation data"
+                                    // Let's show a tiny bar line for 0 or just text at bottom
+
+                                    // Let's ensure text is always shown
+                                    // Bar height: if 0, maybe 2px?
+                                    const effectiveProb = Math.max(prob, 2); // Minimum 2% height for visibility of "empty" spot? Or just text.
+                                    // Actually if 0, bar height is 0. Text should be at bottom.
+
+                                    const barHeight = (Math.max(prob, 0) / 100) * precipMaxHeight;
                                     const x = i * itemWidth + itemWidth / 2;
 
                                     return (
                                         <g key={`precip-${i}`}>
-                                            <rect
-                                                x={x - 6}
-                                                y={height - barHeight}
-                                                width={12}
-                                                height={barHeight}
-                                                fill="url(#precipGradient)"
-                                                rx="2"
-                                            />
-                                            {/* Show Percentage on ALL bars if > 0 */}
-                                            <text x={x} y={height - barHeight - 5} textAnchor="middle" fill="var(--accent-cyan)" fontSize="9" fontWeight="bold">
+                                            {prob > 0 && (
+                                                <rect
+                                                    x={x - 6}
+                                                    y={height - barHeight}
+                                                    width={12}
+                                                    height={barHeight}
+                                                    fill="url(#precipGradient)"
+                                                    rx="2"
+                                                />
+                                            )}
+                                            {/* Show Percentage on ALL bars */}
+                                            {/* If 0%, show at bottom axis */}
+                                            <text
+                                                x={x}
+                                                y={prob > 0 ? height - barHeight - 5 : height - 5}
+                                                textAnchor="middle"
+                                                fill={prob > 0 ? "var(--accent-cyan)" : "var(--text-secondary)"}
+                                                fontSize="10"
+                                                fontWeight={prob > 0 ? "bold" : "normal"}
+                                            >
                                                 {prob}%
                                             </text>
                                         </g>
@@ -229,20 +249,29 @@ const HourlyForecast = ({ hourly }) => {
             {/* Visual Legend */}
             <div className="graph-legend">
                 <div className="legend-item">
-                    {/* Visual Line for Temp */}
-                    <svg width="24" height="6" viewBox="0 0 24 6">
-                        <line x1="0" y1="3" x2="24" y2="3" stroke="url(#tempGradient)" strokeWidth="3" strokeLinecap="round" />
+                    {/* Visual Line for Temp (o-o style) */}
+                    <svg width="40" height="12" viewBox="0 0 40 12" className="overflow-visible">
                         <defs>
-                            <linearGradient id="tempGradient" gradientUnits="userSpaceOnUse" x1="0" y1="6" x2="0" y2="0">
-                                {gradientStops}
+                            <linearGradient id="legendGradient" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="40" y2="0">
+                                <stop offset="0%" stopColor="#3b82f6" />
+                                <stop offset="100%" stopColor="#ef4444" />
                             </linearGradient>
                         </defs>
+                        <line x1="5" y1="6" x2="35" y2="6" stroke="url(#legendGradient)" strokeWidth="3" strokeLinecap="round" />
+                        <circle cx="5" cy="6" r="3" fill="var(--bg-primary)" stroke="#3b82f6" strokeWidth="2" />
+                        <circle cx="35" cy="6" r="3" fill="var(--bg-primary)" stroke="#ef4444" strokeWidth="2" />
                     </svg>
                     <span>Temperature</span>
                 </div>
                 <div className="legend-item">
                     {/* Visual Bar for Precip */}
-                    <div className="w-3 h-3 rounded-[2px] bg-[var(--accent-cyan)] opacity-60"></div>
+                    <svg width="20" height="12" viewBox="0 0 20 12">
+                        <linearGradient id="legendPrecip" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="var(--accent-cyan)" stopOpacity="0.6" />
+                            <stop offset="100%" stopColor="var(--accent-cyan)" stopOpacity="0.2" />
+                        </linearGradient>
+                        <rect x="6" y="0" width="8" height="12" rx="2" fill="url(#legendPrecip)" />
+                    </svg>
                     <span>Precipitation</span>
                 </div>
             </div>

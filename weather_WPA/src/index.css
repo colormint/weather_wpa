@@ -45,12 +45,15 @@
 }
 
 /* Add depth to cards in dark mode */
+/* Add depth to cards in dark mode - Neumorphic Soft Shadow */
 .dark .card {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.7), 0 2px 4px -1px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  border: none;
 }
 
 .dark .modal-content {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+  border: none;
 }
 
 * {
@@ -590,7 +593,8 @@ button.close-btn:hover {
 
 .modal-content {
   background-color: var(--bg-primary);
-  border: 1px solid var(--divider-color);
+  border: 1px solid transparent;
+  /* default transparent, shadow does work */
   width: 90%;
   max-width: 380px;
   position: relative;
@@ -631,6 +635,12 @@ button.close-btn:hover {
   gap: 0.75rem;
   transition: all 0.2s;
   border: 1px solid transparent;
+  /* Stronger shadow for light mode to match cards */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.dark .search-container {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .search-container:focus-within {

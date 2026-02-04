@@ -28,7 +28,7 @@ const DailyCard = ({ day }) => {
     }
 
     return (
-        <div className="day-card justify-between py-6 min-h-[260px]">
+        <div className="day-card card shadow-md border-0 justify-between py-6 min-h-[260px] mx-2 my-2 rounded-xl">
             {/* Header: Date */}
             <div className="flex flex-col items-center">
                 <span className="font-bold text-lg text-[var(--text-primary)]">{dayName}</span>

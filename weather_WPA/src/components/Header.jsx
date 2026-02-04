@@ -35,20 +35,21 @@ const Header = () => {
         // Format: "City, Country"
         const name = result.name;
         const country = result.country;
-        const displayName = result.admin1 ? `${name}, ${country}` : `${name}, ${country}`;
+        const cleanName = result.admin1 ? `${name}, ${country}` : `${name}, ${country}`;
 
         setLocation({
             lat: result.latitude,
             lon: result.longitude,
-            name: displayName,
-            country: result.country
+            name: cleanName,
+            country: result.country,
+            isGPS: false
         });
         setShowResults(false);
         setSearchQuery('');
     };
 
     const handleGeoLocation = () => {
-        setSearchQuery(''); // Clear any existing search text to ensure placeholder shows
+        setSearchQuery('');
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(async (position) => {
                 const lat = position.coords.latitude;
@@ -59,18 +60,15 @@ const Header = () => {
                     const response = await axios.get(`https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lon}&language=en&format=json`);
                     const result = response.data.results ? response.data.results[0] : null;
 
-                    let displayName = "Current Location";
+                    let cleanName = "Current Location";
                     if (result) {
-                        displayName = `📍 ${result.name}, ${result.country} (Current Location)`;
-                    } else {
-                        // Fallback but still try to be descriptive if possible or just stick to format
-                        displayName = "📍 Current Location";
+                        cleanName = `${result.name}, ${result.country}`;
                     }
 
                     setLocation({
                         lat: lat,
                         lon: lon,
-                        name: displayName,
+                        name: cleanName,
                         isGPS: true
                     });
                 } catch (error) {
@@ -78,7 +76,7 @@ const Header = () => {
                     setLocation({
                         lat: lat,
                         lon: lon,
-                        name: "📍 Current Location",
+                        name: "Current Location",
                         isGPS: true
                     });
                 }
@@ -97,7 +95,7 @@ const Header = () => {
                 {/* Row 1: Title and Settings */}
                 <div className="flex w-full justify-between items-center px-1">
                     <h1 className="header-title">
-                        Simple Weather <span className="text-secondary font-medium text-sm">v0.0.9.3</span>
+                        Simple Weather <span className="text-secondary font-medium text-sm">v0.0.9.4</span>
                     </h1>
                     <div className="flex gap-2">
                         <button
@@ -117,18 +115,12 @@ const Header = () => {
                 </div>
 
                 {/* Row 2: Search Bar */}
-                <div className="w-full relative">
-                    <div className="search-container">
+                <div className="w-full relative z-20">
+                    <div className="search-container shadow-md">
                         <Search size={18} className="text-[var(--text-secondary)] flex-shrink-0" />
                         <input
                             type="text"
-                            // If location exists use it, otherwise placeholder.
-                            // BUT: If user is typing code needs to handle value.
-                            // The value prop is searchQuery.
-                            // If searchQuery is empty, we want to show the current location name as placeholder?
-                            // Or should we set the searchQuery to the name?
-                            // Standard pattern: Placeholder shows current context, Input shows user query.
-                            placeholder={location ? location.name : "Search City..."}
+                            placeholder="Search for cities"
                             className="header-input"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
@@ -155,6 +147,18 @@ const Header = () => {
                         </div>
                     )}
                 </div>
+
+                {/* Row 3: Location Indicator */}
+                {location && (
+                    <div className="w-full flex justify-center items-center mt-4 mb-2">
+                        <span className="text-base font-extrabold text-[var(--text-primary)] text-center tracking-tight">
+                            {location.isGPS
+                                ? `📍 ${location.name} (Current Location)`
+                                : location.name
+                            }
+                        </span>
+                    </div>
+                )}
             </header>
 
             {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}

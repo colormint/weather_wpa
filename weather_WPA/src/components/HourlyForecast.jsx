@@ -21,15 +21,24 @@ const HourlyForecast = ({ hourly }) => {
     const tempRange = maxTemp - minTemp || 1;
 
     // Dimensions
-    const itemWidth = 60; // Slightly wider for readability
+    const itemWidth = 60;
     const width = hours.length * itemWidth;
-    const height = 160;
+    const height = 200; // Requested 200px
     const padding = 20;
 
+    // Scale Precip bar height
+    const precipMaxHeight = 60;
+
     // Helper to scale Y (Temperature)
+    // Reserve bottom space for precipitation
+    const graphBottom = height - precipMaxHeight - 10;
     const getY = (temp) => {
-        return height - padding - ((temp - minTemp) / tempRange) * (height - 2 * padding);
+        return graphBottom - ((temp - minTemp) / tempRange) * (graphBottom - padding);
     };
+
+    // Calculate Y for 0 degrees (Reference Line)
+    const yZero = getY(0);
+    const showZeroLine = yZero >= padding && yZero <= graphBottom;
 
     // SVG Points
     const points = hours.map((h, i) => {
@@ -41,9 +50,9 @@ const HourlyForecast = ({ hourly }) => {
     const formatTime = (isoString) => {
         const date = new Date(isoString);
         if (timeFormat === '12h') {
-            return format(date, 'h a').toLowerCase(); // 10am
+            return format(date, 'h a').toLowerCase();
         }
-        return format(date, 'HH:mm'); // 10:00
+        return format(date, 'HH:mm');
     };
 
     const getWeatherText = (code) => {
@@ -56,20 +65,38 @@ const HourlyForecast = ({ hourly }) => {
         return "";
     };
 
-    return (
-        <div className="card overflow-hidden w-full">
-            <h2 className="text-lg font-bold mb-4">24h Forecast</h2>
+    // Dynamic Gradient Stops based on Abs Temperature
+    // Define standard colors for temps: -10 (Blue), 0 (Cyan), 15 (Green), 30 (Red)
+    const tempStops = [
+        { t: -10, c: '#3b82f6' }, // Blue
+        { t: 0, c: '#06b6d4' },   // Cyan
+        { t: 15, c: '#22c55e' },  // Green
+        { t: 30, c: '#ef4444' }   // Red
+    ];
 
-            <div className="graph-wrapper">
-                <div className="graph-scroll scrollbar-hide">
-                    <div style={{ width: `${width}px` }} className="relative flex flex-col">
+    // We need to map these temps to % positions in the gradient.
+    // y1=graphBottom (Low Temp), y2=padding (High Temp).
+    const gradientStops = tempStops.map(s => {
+        let offset = (s.t - minTemp) / (maxTemp - minTemp);
+        // Clamp offset to 0-1
+        if (offset < 0) offset = 0;
+        if (offset > 1) offset = 1;
+        return <stop key={s.t} offset={`${offset * 100}%`} stopColor={s.c} />;
+    });
+
+
+    return (
+        <div className="card overflow-hidden w-full min-h-[450px] flex flex-col gap-4">
+            <h2 className="text-lg font-bold">24h Forecast</h2>
+
+            <div className="graph-wrapper w-full">
+                {/* Scroll Container */}
+                <div className="graph-scroll">
+                    <div style={{ width: `${width}px` }} className="relative flex flex-col justify-between">
 
                         {/* Row 1: Condition Text */}
-                        <div className="flex w-full h-8 relative mb-2">
+                        <div className="flex w-full h-6 relative mb-4">
                             {hours.map((h, i) => {
-                                // De-duplicate text: only show if different from previous or every 3rd to avoid clutter?
-                                // User asked for "Clear/Cloudy text", "Separated row".
-                                // Let's show spaced out.
                                 if (i % 3 !== 0 && i !== 0) return null;
                                 const text = getWeatherText(h.code);
                                 return (
@@ -85,18 +112,36 @@ const HourlyForecast = ({ hourly }) => {
                         </div>
 
                         {/* Row 2: Graph */}
-                        <div className="relative h-[160px] w-full">
+                        <div className="relative h-[200px] w-full">
                             <svg width={width} height={height} className="overflow-visible">
                                 <defs>
-                                    <linearGradient id="lineGradient" gradientUnits="userSpaceOnUse" x1="0" y1={height} x2="0" y2="0">
-                                        <stop offset="0%" stopColor="#3b82f6" /> {/* Blue at bottom (Cold) */}
-                                        <stop offset="50%" stopColor="#22c55e" /> {/* Green/Mild */}
-                                        <stop offset="100%" stopColor="#ef4444" /> {/* Red at top (Hot) */}
+                                    {/* Temp Gradient */}
+                                    <linearGradient id="tempGradient" gradientUnits="userSpaceOnUse" x1="0" y1={graphBottom} x2="0" y2={padding}>
+                                        {gradientStops}
                                     </linearGradient>
-                                    <mask id="gridMask">
-                                        <rect x="0" y="0" width={width} height={height} fill="white" />
-                                    </mask>
+
+                                    <linearGradient id="precipGradient" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stopColor="var(--accent-cyan)" stopOpacity="0.6" />
+                                        <stop offset="100%" stopColor="var(--accent-cyan)" stopOpacity="0.2" />
+                                    </linearGradient>
                                 </defs>
+
+                                {/* 0-Degree Reference Line */}
+                                {showZeroLine && (
+                                    <g>
+                                        <line
+                                            x1={0}
+                                            y1={yZero}
+                                            x2={width}
+                                            y2={yZero}
+                                            stroke="var(--divider-color)"
+                                            strokeDasharray="6 4"
+                                            strokeWidth="1.5"
+                                            opacity="0.7"
+                                        />
+                                        <text x={10} y={yZero - 4} fontSize="12">❄️</text>
+                                    </g>
+                                )}
 
                                 {/* Vertical Grid Lines */}
                                 {hours.map((_, i) => (
@@ -109,13 +154,39 @@ const HourlyForecast = ({ hourly }) => {
                                         stroke="var(--divider-color)"
                                         strokeDasharray="4 4"
                                         strokeWidth="1"
+                                        opacity="0.3"
                                     />
                                 ))}
+
+                                {/* Precipitation Bars */}
+                                {hours.map((h, i) => {
+                                    const prob = h.pop || 0;
+                                    if (prob === 0) return null;
+                                    const barHeight = (prob / 100) * precipMaxHeight;
+                                    const x = i * itemWidth + itemWidth / 2;
+
+                                    return (
+                                        <g key={`precip-${i}`}>
+                                            <rect
+                                                x={x - 6}
+                                                y={height - barHeight}
+                                                width={12}
+                                                height={barHeight}
+                                                fill="url(#precipGradient)"
+                                                rx="2"
+                                            />
+                                            {/* Show Percentage on ALL bars if > 0 */}
+                                            <text x={x} y={height - barHeight - 5} textAnchor="middle" fill="var(--accent-cyan)" fontSize="9" fontWeight="bold">
+                                                {prob}%
+                                            </text>
+                                        </g>
+                                    );
+                                })}
 
                                 {/* Temperature Line */}
                                 <polyline
                                     fill="none"
-                                    stroke="url(#lineGradient)"
+                                    stroke="url(#tempGradient)"
                                     strokeWidth="4"
                                     points={points}
                                     strokeLinecap="round"
@@ -128,7 +199,7 @@ const HourlyForecast = ({ hourly }) => {
                                     const y = getY(h.temp);
                                     return (
                                         <g key={i}>
-                                            <circle cx={x} cy={y} r="4" fill="var(--bg-primary)" stroke="url(#lineGradient)" strokeWidth="2" />
+                                            <circle cx={x} cy={y} r="4" fill="var(--bg-primary)" stroke="url(#tempGradient)" strokeWidth="2" />
                                             <text x={x} y={y - 12} textAnchor="middle" fill="var(--text-primary)" fontSize="12" fontWeight="bold">
                                                 {Math.round(h.temp)}°
                                             </text>
@@ -139,7 +210,7 @@ const HourlyForecast = ({ hourly }) => {
                         </div>
 
                         {/* Row 3: Time Labels */}
-                        <div className="flex w-full h-8 relative mt-2">
+                        <div className="flex w-full h-6 relative mt-4">
                             {hours.map((h, i) => (
                                 <span
                                     key={`time-${i}`}
@@ -154,6 +225,28 @@ const HourlyForecast = ({ hourly }) => {
                     </div>
                 </div>
             </div>
+
+            {/* Visual Legend */}
+            <div className="graph-legend">
+                <div className="legend-item">
+                    {/* Visual Line for Temp */}
+                    <svg width="24" height="6" viewBox="0 0 24 6">
+                        <line x1="0" y1="3" x2="24" y2="3" stroke="url(#tempGradient)" strokeWidth="3" strokeLinecap="round" />
+                        <defs>
+                            <linearGradient id="tempGradient" gradientUnits="userSpaceOnUse" x1="0" y1="6" x2="0" y2="0">
+                                {gradientStops}
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span>Temperature</span>
+                </div>
+                <div className="legend-item">
+                    {/* Visual Bar for Precip */}
+                    <div className="w-3 h-3 rounded-[2px] bg-[var(--accent-cyan)] opacity-60"></div>
+                    <span>Precipitation</span>
+                </div>
+            </div>
+
         </div>
     );
 };

@@ -148,7 +148,8 @@ h3 {
   align-items: center;
   text-align: center;
   gap: var(--spacing-md);
-  padding: var(--spacing-xl) 0;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  /* Restore horizontal padding */
 }
 
 .weather-icon {
@@ -547,6 +548,10 @@ button.close-btn:hover {
   text-align: center;
 }
 
+.text-left {
+  text-align: left;
+}
+
 .overflow-hidden {
   overflow: hidden;
 }
@@ -664,10 +669,17 @@ button.close-btn:hover {
   border: none;
   background: transparent;
   cursor: pointer;
+  color: var(--text-primary);
+  /* Explicit color */
 }
 
 .dropdown-item:hover {
   background-color: var(--bg-secondary);
+}
+
+/* Ensure icons in dropdown inherit color or are visible */
+.dropdown-item svg {
+  color: var(--accent-blue);
 }
 
 /* Graph Container */
@@ -679,7 +691,46 @@ button.close-btn:hover {
 .graph-scroll {
   width: 100%;
   overflow-x: auto;
-  padding-bottom: 0.5rem;
+  padding-bottom: 1.5rem;
+  /* Space for scrollbar */
+}
+
+/* Custom Visible Scrollbar for Graph */
+.graph-scroll::-webkit-scrollbar {
+  height: 6px;
+  display: block;
+  /* Force show */
+}
+
+.graph-scroll::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+}
+
+.graph-scroll::-webkit-scrollbar-thumb {
+  background: var(--divider-color);
+  border-radius: 4px;
+}
+
+.graph-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+.graph-legend {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--divider-color);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 /* Grid */

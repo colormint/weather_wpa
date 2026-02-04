@@ -32,14 +32,59 @@ const Header = () => {
     }, [searchQuery]);
 
     const handleSelect = (result) => {
+        // Format: "City, Country"
+        const name = result.name;
+        const country = result.country;
+        const displayName = result.admin1 ? `${name}, ${country}` : `${name}, ${country}`;
+
         setLocation({
             lat: result.latitude,
             lon: result.longitude,
-            name: result.name,
+            name: displayName,
             country: result.country
         });
         setShowResults(false);
         setSearchQuery('');
+    };
+
+    const handleGeoLocation = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+
+                try {
+                    // Reverse Geocoding to get City Name
+                    const response = await axios.get(`https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lon}&language=en&format=json`);
+                    const result = response.data.results ? response.data.results[0] : null;
+
+                    let displayName = "Current Location";
+                    if (result) {
+                        displayName = `📍 ${result.name}, ${result.country}`;
+                    }
+
+                    setLocation({
+                        lat: lat,
+                        lon: lon,
+                        name: displayName,
+                        isGPS: true
+                    });
+                } catch (error) {
+                    console.error("Reverse geocoding failed", error);
+                    setLocation({
+                        lat: lat,
+                        lon: lon,
+                        name: "📍 Current Location",
+                        isGPS: true
+                    });
+                }
+            }, (error) => {
+                console.error("Geolocation error", error);
+                alert("Unable to retrieve your location");
+            });
+        } else {
+            alert("Geolocation is not supported by your browser");
+        }
     };
 
     return (
@@ -48,14 +93,23 @@ const Header = () => {
                 {/* Row 1: Title and Settings */}
                 <div className="flex w-full justify-between items-center px-1">
                     <h1 className="header-title">
-                        Simple Weather <span className="text-secondary font-medium text-sm">v0.0.9.4</span>
+                        Simple Weather <span className="text-secondary font-medium text-sm">v0.1.0</span>
                     </h1>
-                    <button
-                        onClick={() => setShowSettings(true)}
-                        className="icon-btn"
-                    >
-                        <Settings size={22} />
-                    </button>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={handleGeoLocation}
+                            className="icon-btn"
+                            title="Use Current Location"
+                        >
+                            <MapPin size={22} />
+                        </button>
+                        <button
+                            onClick={() => setShowSettings(true)}
+                            className="icon-btn"
+                        >
+                            <Settings size={22} />
+                        </button>
+                    </div>
                 </div>
 
                 {/* Row 2: Search Bar */}

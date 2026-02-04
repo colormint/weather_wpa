@@ -27,9 +27,11 @@ const getWeatherIcon = (code, isDay) => {
 const CurrentWeather = ({ temperature, weatherCode, isDay, feelsLike, high, low }) => {
     return (
         <div className="w-full">
-            <div className="card current-weather relative pt-10">
-                <h2 className="text-lg font-bold absolute top-4 left-6">Overview</h2>
-                <div className="weather-icon">
+            <div className="card current-weather flex flex-col items-center">
+                <div className="w-full text-left self-start">
+                    <h2 className="text-lg font-bold">Overview</h2>
+                </div>
+                <div className="weather-icon mt-4">
                     {getWeatherIcon(weatherCode, isDay)}
                 </div>
                 <div className="flex flex-col items-center">

@@ -411,18 +411,19 @@ body.dark a:hover {
   color: var(--text-primary);
   font-weight: 500;
   cursor: pointer;
-  border: 1px solid transparent;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   transition: all 0.2s;
 }
 
 .radio-item:hover {
-  border-color: var(--divider-color);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .radio-item.active {
   background-color: var(--bg-primary);
-  border-color: var(--accent-blue);
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+  /* border-color: var(--accent-blue); Removed */
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
 
 .radio-circle {
@@ -784,6 +785,9 @@ button.close-btn:hover {
   width: 100%;
   padding-bottom: var(--spacing-sm);
   -webkit-overflow-scrolling: touch;
+  padding: 1rem;
+  margin: -1rem;
+  width: auto;
 }
 
 .day-card {
@@ -798,8 +802,8 @@ button.close-btn:hover {
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  border: 1px solid var(--divider-color);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
   transition: transform 0.2s;
 }
 

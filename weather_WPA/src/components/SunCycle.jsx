@@ -1,5 +1,4 @@
 import React from 'react';
-import { Sunrise, Sunset } from 'lucide-react';
 import { format } from 'date-fns';
 
 const SunCycle = ({ sunrise, sunset }) => {
@@ -13,13 +12,23 @@ const SunCycle = ({ sunrise, sunset }) => {
             <h2 className="sun-title">Sun Cycle</h2>
             <div className="sun-grid">
                 <div className="sun-item">
-                    <Sunrise size={32} className="text-[var(--accent-yellow)] mb-2" />
+                    <span
+                        className="mb-6 filter drop-shadow-sm leading-none"
+                        style={{ fontSize: '5rem' }}
+                    >
+                        🌅
+                    </span>
                     <span className="sun-time">{sunriseTime}</span>
                     <span className="text-mute">Sunrise</span>
                 </div>
                 <div className="divider"></div>
                 <div className="sun-item">
-                    <Sunset size={32} className="text-[var(--accent-yellow)] mb-2" />
+                    <span
+                        className="mb-6 filter drop-shadow-sm leading-none"
+                        style={{ fontSize: '5rem' }}
+                    >
+                        🌇
+                    </span>
                     <span className="sun-time">{sunsetTime}</span>
                     <span className="text-mute">Sunset</span>
                 </div>

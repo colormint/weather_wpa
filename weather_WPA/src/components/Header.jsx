@@ -5,7 +5,7 @@ import SettingsModal from './SettingsModal';
 import axios from 'axios';
 
 const Header = () => {
-    const { location, setLocation } = useWeather();
+    const { location, setLocation, theme } = useWeather();
     const [showSettings, setShowSettings] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [results, setResults] = useState([]);
@@ -95,7 +95,7 @@ const Header = () => {
                 {/* Row 1: Title and Settings */}
                 <div className="flex w-full justify-between items-center px-1">
                     <h1 className="header-title">
-                        Simple Weather <span className="text-secondary font-medium text-sm">v0.0.9.5</span>
+                        Simple Weather <span className="text-secondary font-medium text-sm">v0.1.0</span>
                     </h1>
                     <div className="flex gap-2">
                         <button
@@ -150,7 +150,10 @@ const Header = () => {
 
                 {location && (
                     <div className="w-full flex justify-center items-center mt-4 mb-2">
-                        <span className="text-base font-extrabold text-[var(--text-primary)] text-center tracking-tight">
+                        <span
+                            className="text-xl font-black text-center tracking-tight"
+                            style={{ color: theme === 'dark' ? '#ffffff' : '#000000' }}
+                        >
                             {location.isGPS
                                 ? (location.name === "Current Location" ? "📍 Current Location" : `📍 ${location.name} (Current Location)`)
                                 : location.name

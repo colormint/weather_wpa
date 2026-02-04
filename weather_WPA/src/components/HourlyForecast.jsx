@@ -7,31 +7,61 @@ const HourlyForecast = ({ hourly }) => {
 
     if (!hourly) return null;
 
-    // Data for next 24 hours
-    const hours = hourly.time.slice(0, 25).map((t, i) => ({
+    // Find Current Hour Index
+    const now = new Date();
+    // API times are ISO. We find the first time that is >= current hour (ignoring minutes/seconds for the "current" slot, or just find nearest)
+    // Actually, simple string comparison or Date object works.
+    // Let's find the index where the hour matches current hour.
+    const currentHourIndex = hourly.time.findIndex(t => {
+        const timeDate = new Date(t);
+        return timeDate.getTime() >= now.setMinutes(0, 0, 0); // Compare with current hour:00
+    });
+
+    // Fallback to 0 if not found (shouldn't happen with proper API data)
+    const startIndex = currentHourIndex !== -1 ? currentHourIndex : 0;
+
+    // Slice next 25 hours
+    const hours = hourly.time.slice(startIndex, startIndex + 25).map((t, i) => ({
         time: t,
-        temp: hourly.temperature_2m[i],
-        code: hourly.weather_code[i],
-        pop: hourly.precipitation_probability ? hourly.precipitation_probability[i] : 0
+        temp: hourly.temperature_2m[startIndex + i],
+        code: hourly.weather_code[startIndex + i],
+        pop: hourly.precipitation_probability ? hourly.precipitation_probability[startIndex + i] : 0
     }));
 
     // Calculate scales
-    const maxTemp = Math.max(...hours.map(h => h.temp)) + 2;
-    const minTemp = Math.min(...hours.map(h => h.temp)) - 2;
+    let rawMax = Math.max(...hours.map(h => h.temp));
+    let rawMin = Math.min(...hours.map(h => h.temp));
+
+    // Refinement RC6: 
+    // 1. Min Range: 10 degrees (was 15). Prevents "flat line" but doesn't over-expand.
+    // 2. Padding: Small buffer (+2/-2) to keep curve "tight" as requested.
+
+    let range = rawMax - rawMin;
+    if (range < 10) {
+        const mid = (rawMax + rawMin) / 2;
+        rawMax = mid + 5;
+        rawMin = mid - 5;
+    }
+
+    // Small wiggle room
+    const maxTemp = rawMax + 2;
+    const minTemp = rawMin - 2;
+
+    // Recalculate range
     const tempRange = maxTemp - minTemp || 1;
 
     // Dimensions
     const itemWidth = 60;
     const width = hours.length * itemWidth;
     const height = 200; // Requested 200px
-    const padding = 20;
+    const padding = 40; // Top padding
 
     // Scale Precip bar height
     const precipMaxHeight = 60;
 
     // Helper to scale Y (Temperature)
-    // Reserve bottom space for precipitation
-    const graphBottom = height - precipMaxHeight - 10;
+    // Reserve bottom space for precipitation (more buffer)
+    const graphBottom = height - precipMaxHeight - 20;
     const getY = (temp) => {
         return graphBottom - ((temp - minTemp) / tempRange) * (graphBottom - padding);
     };
@@ -55,13 +85,23 @@ const HourlyForecast = ({ hourly }) => {
         return format(date, 'HH:mm');
     };
 
-    const getWeatherText = (code) => {
-        if (code === 0) return "☀️ Clear";
-        if (code <= 3) return "☁️ Cloudy";
-        if (code <= 48) return "🌫️ Fog";
-        if (code <= 67) return "🌧️ Rain";
-        if (code <= 77) return "❄️ Snow";
-        if (code <= 99) return "⛈️ Storm";
+    const getWeatherEmoji = (code) => {
+        if (code === 0) return "☀️";
+        if (code <= 3) return "☁️";
+        if (code <= 48) return "🌫️";
+        if (code <= 67) return "🌧️";
+        if (code <= 77) return "❄️";
+        if (code <= 99) return "⛈️";
+        return "";
+    };
+
+    const getWeatherLabel = (code) => {
+        if (code === 0) return "Clear";
+        if (code <= 3) return "Cloudy";
+        if (code <= 48) return "Fog";
+        if (code <= 67) return "Rain";
+        if (code <= 77) return "Snow";
+        if (code <= 99) return "Storm";
         return "";
     };
 
@@ -92,21 +132,23 @@ const HourlyForecast = ({ hourly }) => {
             <div className="graph-wrapper w-full">
                 {/* Scroll Container */}
                 <div className="graph-scroll">
-                    <div style={{ width: `${width}px` }} className="relative flex flex-col justify-between">
+                    <div style={{ width: `${width}px` }} className="relative flex flex-col justify-between pt-4">
 
-                        {/* Row 1: Condition Text */}
-                        <div className="flex w-full h-8 relative mb-4">
+                        {/* Row 1: Condition Text (Emoji Above, Text Below) */}
+                        <div className="flex w-full h-12 relative mb-8">
                             {hours.map((h, i) => {
                                 if (i % 3 !== 0 && i !== 0) return null;
-                                const text = getWeatherText(h.code);
+                                const emoji = getWeatherEmoji(h.code);
+                                const label = getWeatherLabel(h.code);
                                 return (
-                                    <span
+                                    <div
                                         key={`cond-${i}`}
-                                        className="absolute text-sm text-[var(--text-secondary)] font-medium text-center transform -translate-x-1/2 whitespace-nowrap"
-                                        style={{ left: i * itemWidth + itemWidth / 2 }}
+                                        className="absolute flex flex-col items-center transform -translate-x-1/2"
+                                        style={{ left: i * itemWidth + itemWidth / 2, top: 0 }}
                                     >
-                                        {text}
-                                    </span>
+                                        <span className="text-xl mb-1">{emoji}</span>
+                                        <span className="text-xs text-[var(--text-secondary)] font-medium whitespace-nowrap leading-none">{label}</span>
+                                    </div>
                                 );
                             })}
                         </div>
@@ -197,7 +239,7 @@ const HourlyForecast = ({ hourly }) => {
                                                 fontSize="10"
                                                 fontWeight={prob > 0 ? "bold" : "normal"}
                                             >
-                                                {prob}%
+                                                {prob > 0 ? `${prob}%` : '-%'}
                                             </text>
                                         </g>
                                     );

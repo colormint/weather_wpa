@@ -1,16 +1,34 @@
-# React + Vite
+# Simple Weather PWA (v0.1.0)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A beautiful, minimalistic weather application designed for simplicity and performance. Built with **React + Vite** and optimized as a Progressive Web App (PWA) for installability on mobile and desktop.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+-   **Accurate Forecasts**: Uses **Open-Meteo** and **RainViewer** (Radar) for reliable data.
+-   **Smart Location**: GPS support with "Current Location" tracking, plus city search.
+-   **Visual Richness**:
+    -   **Dynamic 24h Graph**: Temperature curves that adapt to ranges, ensuring readability without distortion.
+    -   **Sun Cycle**: Huge emoji visualizations for Sunrise/Sunset.
+    -   **Radar Integration**: Real-time precipitation map.
+-   **PWA Ready**: Installable, works offline (cached assets), and feels native.
+-   **Dark Mode**: Automatically detects system preference or togglable via settings.
+-   **Units**: Metric (°C, m/s) or Imperial (°F, mph).
+-   **Time Format**: 12h or 24h.
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+-   **Frontend**: React 19, Vite
+-   **Styling**: Vanilla CSS (Variables & Utility classes), Lucide React (Icons).
+-   **Data**: Open-Meteo API (Weather/Geocoding), RainViewer (Radar).
+-   **Charts**: Recharts (Custom SVG implementation for 24h graph).
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1.  Clone repository.
+2.  `npm install`
+3.  `npm run dev` for local development.
+4.  `npm run build` for production.
+
+---
+
+*v0.1.0-RC2 Release Candidate*

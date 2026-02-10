@@ -31,18 +31,34 @@ export const WeatherProvider = ({ children }) => {
         }
     }, [location]);
 
+    const [effectiveTheme, setEffectiveTheme] = useState(theme);
+
     useEffect(() => {
         const root = window.document.body;
         root.classList.remove('light', 'dark');
 
+        let activeTheme = theme;
         if (theme === 'system') {
-            const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            root.classList.add(systemTheme);
-        } else {
-            root.classList.add(theme);
+            activeTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }
 
+        root.classList.add(activeTheme);
+        setEffectiveTheme(activeTheme);
+
         localStorage.setItem('weather-theme', theme);
+
+        // Listen for system changes if mode is system
+        if (theme === 'system') {
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            const handleChange = (e) => {
+                const newTheme = e.matches ? 'dark' : 'light';
+                root.classList.remove('light', 'dark');
+                root.classList.add(newTheme);
+                setEffectiveTheme(newTheme);
+            };
+            mediaQuery.addEventListener('change', handleChange);
+            return () => mediaQuery.removeEventListener('change', handleChange);
+        }
     }, [theme]);
 
     useEffect(() => {
@@ -56,6 +72,7 @@ export const WeatherProvider = ({ children }) => {
     const value = {
         theme,
         setTheme,
+        effectiveTheme, // Expose the actual resolved theme
         units,
         setUnits,
         timeFormat,

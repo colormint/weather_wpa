@@ -7,6 +7,7 @@ import AirQuality from './components/AirQuality';
 import HourlyForecast from './components/HourlyForecast';
 import WeeklyForecast from './components/WeeklyForecast';
 import SunCycle from './components/SunCycle';
+import WeatherRadar from './components/WeatherRadar';
 import { Loader2, AlertCircle } from 'lucide-react';
 
 function App() {
@@ -147,6 +148,8 @@ function App() {
         sunrise={daily.sunrise[0]}
         sunset={daily.sunset[0]}
       />
+
+      <WeatherRadar />
 
       <footer className="text-center text-mute mt-4 pb-8 text-xs flex flex-col gap-2">
         <span>Weather data by <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" className="underline font-medium decoration-slice">Open-Meteo.com</a> & <a href="https://www.rainviewer.com/" target="_blank" rel="noopener noreferrer" className="underline font-medium decoration-slice">RainViewer</a></span>

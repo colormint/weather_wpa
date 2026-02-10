@@ -25,7 +25,9 @@ const HourlyForecast = ({ hourly }) => {
         time: t,
         temp: hourly.temperature_2m[startIndex + i],
         code: hourly.weather_code[startIndex + i],
-        pop: hourly.precipitation_probability ? hourly.precipitation_probability[startIndex + i] : 0
+        pop: hourly.precipitation_probability && hourly.precipitation_probability[startIndex + i] !== null
+            ? hourly.precipitation_probability[startIndex + i]
+            : null
     }));
 
     // Calculate scales
@@ -51,7 +53,7 @@ const HourlyForecast = ({ hourly }) => {
     const tempRange = maxTemp - minTemp || 1;
 
     // Dimensions
-    const itemWidth = 60;
+    const itemWidth = 50;
     const width = hours.length * itemWidth;
     const height = 200; // Requested 200px
     const padding = 40; // Top padding
@@ -203,7 +205,7 @@ const HourlyForecast = ({ hourly }) => {
 
                                 {/* Precipitation Bars */}
                                 {hours.map((h, i) => {
-                                    const prob = h.pop || 0;
+                                    const prob = h.pop; // Can be null, 0, or >0
                                     // Always render bar frame or text for 0%
                                     // If 0, min height for visual or just text? 
                                     // User said "put percentage even on 0% precipitation data"
@@ -239,7 +241,7 @@ const HourlyForecast = ({ hourly }) => {
                                                 fontSize="10"
                                                 fontWeight={prob > 0 ? "bold" : "normal"}
                                             >
-                                                {prob > 0 ? `${prob}%` : '-%'}
+                                                {prob !== null ? `${prob}%` : '-%'}
                                             </text>
                                         </g>
                                     );

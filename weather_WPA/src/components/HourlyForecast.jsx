@@ -56,7 +56,7 @@ const HourlyForecast = ({ hourly }) => {
     const itemWidth = 50;
     const width = hours.length * itemWidth;
     const height = 200; // Requested 200px
-    const padding = 40; // Top padding
+    const padding = 60; // Top padding
 
     // Scale Precip bar height
     const precipMaxHeight = 60;
@@ -207,8 +207,6 @@ const HourlyForecast = ({ hourly }) => {
                                 {hours.map((h, i) => {
                                     const prob = h.pop; // Can be null, 0, or >0
                                     // Always render bar frame or text for 0%
-                                    // If 0, min height for visual or just text? 
-                                    // User said "put percentage even on 0% precipitation data"
                                     // Let's show a tiny bar line for 0 or just text at bottom
 
                                     // Let's ensure text is always shown

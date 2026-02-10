@@ -95,7 +95,7 @@ const Header = () => {
                 {/* Row 1: Title and Settings */}
                 <div className="flex w-full justify-between items-center px-1">
                     <h1 className="header-title">
-                        Simple Weather <span className="text-secondary font-medium text-sm">v0.1.3</span>
+                        Simple Weather <span className="text-secondary font-medium text-sm">v0.1.3.1</span>
                     </h1>
                     <div className="flex gap-2">
                         <button
@@ -151,7 +151,7 @@ const Header = () => {
                 {location && (
                     <div className="w-full flex justify-center items-center mt-4 mb-2">
                         <span
-                            className="text-xl font-black text-center tracking-tight"
+                            className="text-xl font-bold text-center tracking-tight"
                             style={{ color: effectiveTheme === 'dark' ? '#ffffff' : '#000000' }}
                         >
                             {location.isGPS

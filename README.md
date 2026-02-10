@@ -1,4 +1,4 @@
-# Simple Weather PWA (v0.1.3)
+# Simple Weather PWA (v0.1.3.1)
 
 A beautiful, minimalistic weather application designed for simplicity and performance. Built with **React + Vite** and optimized as a Progressive Web App (PWA) for installability on mobile and desktop.
 

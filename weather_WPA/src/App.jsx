@@ -11,7 +11,7 @@ import WeatherRadar from './components/WeatherRadar';
 import { Loader2, AlertCircle } from 'lucide-react';
 
 function App() {
-  const { location, setLocation, units } = useWeather();
+  const { location, setLocation, units, t } = useWeather();
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -20,7 +20,7 @@ function App() {
   useEffect(() => {
     if (location) return;
 
-    const SEOUL = { lat: 37.5665, lon: 126.9780, name: "Seoul (Default)" };
+    const SEOUL = { lat: 37.5665, lon: 126.9780, name: t.seoulDefault };
 
     if (!navigator.geolocation) {
       setLocation(SEOUL);
@@ -33,7 +33,7 @@ function App() {
         setLocation({
           lat: position.coords.latitude,
           lon: position.coords.longitude,
-          name: "Current Location"
+          name: t.currentLocation
         });
       },
       (err) => {
@@ -120,10 +120,25 @@ function App() {
     <div className="container">
       {error && error.includes("default location") && (
         <div className="bg-[var(--accent-yellow)] text-black p-2 text-center text-sm font-bold animate-pulse">
-          Using default location (Seoul). Tap Search to find your city.
+          {t.defaultLocationMsg}
         </div>
       )}
       <Header />
+
+      {location && (
+        <div className="w-full flex justify-center items-center">
+          <span className="text-xl font-bold text-center tracking-tight text-[var(--text-primary)]">
+            {location.isGPS
+              ? (location.name === t.currentLocation || location.name === "Current Location" || location.name === "현재 위치"
+                ? `📍 ${t.currentLocation}`
+                : `📍 ${location.name} (${t.currentLocation})`)
+              : (location.name === "Seoul (Default)" || location.name === "서울 (기본)"
+                ? t.seoulDefault
+                : location.name)
+            }
+          </span>
+        </div>
+      )}
 
       <CurrentWeather
         temperature={cw.temperature_2m}
@@ -139,6 +154,7 @@ function App() {
       <AirQuality
         pm10={aqCurrent.pm10}
         pm25={aqCurrent.pm2_5}
+        timezone={data.weather.timezone}
       />
 
       <WeeklyForecast daily={daily} />

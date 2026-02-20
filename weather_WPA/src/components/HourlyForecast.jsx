@@ -1,9 +1,11 @@
 import React from 'react';
 import { format } from 'date-fns';
+import { ko, enUS } from 'date-fns/locale';
 import { useWeather } from '../context/WeatherContext';
+import { tempStops } from '../utils/colors';
 
 const HourlyForecast = ({ hourly }) => {
-    const { timeFormat } = useWeather();
+    const { timeFormat, t, language } = useWeather();
 
     if (!hourly) return null;
 
@@ -54,34 +56,35 @@ const HourlyForecast = ({ hourly }) => {
 
     // Dimensions
     const itemWidth = 50;
-    const width = hours.length * itemWidth;
-    const height = 200; // Requested 200px
-    const padding = 60; // Top padding
-
-    // Scale Precip bar height
-    const precipMaxHeight = 60;
+    const horizontalPadding = 20; // Padding to prevent clipping on the edges
+    const width = hours.length * itemWidth + (horizontalPadding * 2);
+    const height = 300; // Increased overall height slightly
+    const tempGraphTop = 80; // Top bound for temp line
+    const tempGraphBottom = 180; // Bottom bound for temp line
+    const precipBaseY = 260; // Base line for precipitation bars
+    const precipMaxHeight = 40; // Max height for precip bars
 
     // Helper to scale Y (Temperature)
-    // Reserve bottom space for precipitation (more buffer)
-    const graphBottom = height - precipMaxHeight - 20;
     const getY = (temp) => {
-        return graphBottom - ((temp - minTemp) / tempRange) * (graphBottom - padding);
+        return tempGraphBottom - ((temp - minTemp) / tempRange) * (tempGraphBottom - tempGraphTop);
     };
 
     // Calculate Y for 0 degrees (Reference Line)
     const yZero = getY(0);
-    const showZeroLine = yZero >= padding && yZero <= graphBottom;
+    const showZeroLine = yZero >= tempGraphTop && yZero <= tempGraphBottom;
 
     // SVG Points
     const points = hours.map((h, i) => {
-        const x = i * itemWidth + itemWidth / 2;
+        const x = horizontalPadding + i * itemWidth + itemWidth / 2;
         const y = getY(h.temp);
         return `${x},${y}`;
     }).join(' ');
 
+    const locale = language === 'ko' ? ko : enUS;
     const formatTime = (isoString) => {
         const date = new Date(isoString);
         if (timeFormat === '12h') {
+            if (language === 'ko') return format(date, 'a h시', { locale });
             return format(date, 'h a').toLowerCase();
         }
         return format(date, 'HH:mm');
@@ -98,6 +101,17 @@ const HourlyForecast = ({ hourly }) => {
     };
 
     const getWeatherLabel = (code) => {
+        // We'll use a very simple manual localization or just pass through for now, as full WMO translation is needed.
+        // For simplicity, let's keep English if language is en, or simple Korean if ko.
+        if (language === 'ko') {
+            if (code === 0) return "맑음";
+            if (code <= 3) return "구름조금";
+            if (code <= 48) return "안개";
+            if (code <= 67) return "비";
+            if (code <= 77) return "눈";
+            if (code <= 99) return "뇌우";
+            return "";
+        }
         if (code === 0) return "Clear";
         if (code <= 3) return "Cloudy";
         if (code <= 48) return "Fog";
@@ -107,17 +121,7 @@ const HourlyForecast = ({ hourly }) => {
         return "";
     };
 
-    // Dynamic Gradient Stops based on Abs Temperature
-    // Define standard colors for temps: -10 (Blue), 0 (Cyan), 15 (Green), 30 (Red)
-    const tempStops = [
-        { t: -10, c: '#3b82f6' }, // Blue
-        { t: 0, c: '#06b6d4' },   // Cyan
-        { t: 15, c: '#22c55e' },  // Green
-        { t: 30, c: '#ef4444' }   // Red
-    ];
-
     // We need to map these temps to % positions in the gradient.
-    // y1=graphBottom (Low Temp), y2=padding (High Temp).
     const gradientStops = tempStops.map(s => {
         let offset = (s.t - minTemp) / (maxTemp - minTemp);
         // Clamp offset to 0-1
@@ -126,164 +130,151 @@ const HourlyForecast = ({ hourly }) => {
         return <stop key={s.t} offset={`${offset * 100}%`} stopColor={s.c} />;
     });
 
-
     return (
         <div className="card overflow-hidden w-full min-h-[450px] flex flex-col gap-4">
-            <h2 className="text-lg font-bold">24h Forecast</h2>
+            <h2 className="text-lg font-bold">{t.forecast24h}</h2>
 
             <div className="graph-wrapper w-full">
                 {/* Scroll Container */}
-                <div className="graph-scroll">
-                    <div style={{ width: `${width}px` }} className="relative flex flex-col justify-between pt-4">
+                <div className="graph-scroll pt-2">
+                    <div style={{ width: `${width}px` }} className="relative h-[300px]">
+                        <svg width={width} height={height} className="overflow-visible block">
+                            <defs>
+                                {/* Temp Gradient */}
+                                <linearGradient id="tempGradient" gradientUnits="userSpaceOnUse" x1="0" y1={tempGraphBottom} x2="0" y2={tempGraphTop}>
+                                    {gradientStops}
+                                </linearGradient>
 
-                        {/* Row 1: Condition Text (Emoji Above, Text Below) */}
-                        <div className="flex w-full h-12 relative mb-8">
+                                <linearGradient id="precipGradient" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stopColor="var(--accent-cyan)" stopOpacity="0.6" />
+                                    <stop offset="100%" stopColor="var(--accent-cyan)" stopOpacity="0.2" />
+                                </linearGradient>
+                            </defs>
+
+                            {/* Row 1: Condition Emjois & Text */}
                             {hours.map((h, i) => {
                                 if (i % 3 !== 0 && i !== 0) return null;
                                 const emoji = getWeatherEmoji(h.code);
                                 const label = getWeatherLabel(h.code);
+                                const x = horizontalPadding + i * itemWidth + itemWidth / 2;
                                 return (
-                                    <div
-                                        key={`cond-${i}`}
-                                        className="absolute flex flex-col items-center transform -translate-x-1/2"
-                                        style={{ left: i * itemWidth + itemWidth / 2, top: 0 }}
-                                    >
-                                        <span className="text-xl mb-1">{emoji}</span>
-                                        <span className="text-xs text-[var(--text-secondary)] font-medium whitespace-nowrap leading-none">{label}</span>
-                                    </div>
+                                    <g key={`cond-${i}`}>
+                                        <text x={x} y={24} textAnchor="middle" fontSize="24">{emoji}</text>
+                                        <text x={x} y={48} textAnchor="middle" fill="var(--text-secondary)" fontSize="12" fontWeight="600">{label}</text>
+                                    </g>
                                 );
                             })}
-                        </div>
 
-                        {/* Row 2: Graph */}
-                        <div className="relative h-[200px] w-full">
-                            <svg width={width} height={height} className="overflow-visible">
-                                <defs>
-                                    {/* Temp Gradient */}
-                                    <linearGradient id="tempGradient" gradientUnits="userSpaceOnUse" x1="0" y1={graphBottom} x2="0" y2={padding}>
-                                        {gradientStops}
-                                    </linearGradient>
+                            {/* 0-Degree Reference Line */}
+                            {showZeroLine && (
+                                <g>
+                                    <line
+                                        x1={horizontalPadding}
+                                        y1={yZero}
+                                        x2={width - horizontalPadding}
+                                        y2={yZero}
+                                        stroke="var(--divider-color)"
+                                        strokeDasharray="6 4"
+                                        strokeWidth="1.5"
+                                        opacity="0.8"
+                                    />
+                                    <text x={horizontalPadding - 12} y={yZero + 4} fontSize="12" fill="var(--accent-cyan)">❄️</text>
+                                </g>
+                            )}
 
-                                    <linearGradient id="precipGradient" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stopColor="var(--accent-cyan)" stopOpacity="0.6" />
-                                        <stop offset="100%" stopColor="var(--accent-cyan)" stopOpacity="0.2" />
-                                    </linearGradient>
-                                </defs>
-
-                                {/* 0-Degree Reference Line */}
-                                {showZeroLine && (
-                                    <g>
-                                        <line
-                                            x1={0}
-                                            y1={yZero}
-                                            x2={width}
-                                            y2={yZero}
-                                            stroke="var(--divider-color)"
-                                            strokeDasharray="6 4"
-                                            strokeWidth="1.5"
-                                            opacity="0.8"
-                                        />
-                                        {/* Adjusted Ice Emoji Position: Snowflake, Small, Left */}
-                                        <text x={0} y={yZero + 4} fontSize="14">❄️</text>
-                                    </g>
-                                )}
-
-                                {/* Vertical Grid Lines */}
-                                {hours.map((_, i) => (
+                            {/* Vertical Grid Lines */}
+                            {hours.map((_, i) => {
+                                const x = horizontalPadding + i * itemWidth + itemWidth / 2;
+                                return (
                                     <line
                                         key={`grid-${i}`}
-                                        x1={i * itemWidth + itemWidth / 2}
-                                        y1={0}
-                                        x2={i * itemWidth + itemWidth / 2}
-                                        y2={height}
+                                        x1={x}
+                                        y1={tempGraphTop}
+                                        x2={x}
+                                        y2={precipBaseY}
                                         stroke="var(--divider-color)"
                                         strokeDasharray="4 4"
                                         strokeWidth="1"
                                         opacity="0.5"
                                     />
-                                ))}
+                                )
+                            })}
 
-                                {/* Precipitation Bars */}
-                                {hours.map((h, i) => {
-                                    const prob = h.pop; // Can be null, 0, or >0
-                                    // Always render bar frame or text for 0%
-                                    // Let's show a tiny bar line for 0 or just text at bottom
+                            {/* Precipitation Bars */}
+                            {hours.map((h, i) => {
+                                const prob = h.pop; // Can be null, 0, or >0
+                                const barHeight = (Math.max(prob, 0) / 100) * precipMaxHeight;
+                                const x = horizontalPadding + i * itemWidth + itemWidth / 2;
 
-                                    // Let's ensure text is always shown
-                                    // Bar height: if 0, maybe 2px?
-                                    const effectiveProb = Math.max(prob, 2); // Minimum 2% height for visibility of "empty" spot? Or just text.
-                                    // Actually if 0, bar height is 0. Text should be at bottom.
+                                return (
+                                    <g key={`precip-${i}`}>
+                                        {prob > 0 && (
+                                            <rect
+                                                x={x - 6}
+                                                y={precipBaseY - barHeight}
+                                                width={12}
+                                                height={barHeight}
+                                                fill="url(#precipGradient)"
+                                                rx="2"
+                                            />
+                                        )}
+                                        {/* Show Percentage on ALL bars */}
+                                        <text
+                                            x={x}
+                                            y={prob > 0 ? precipBaseY - barHeight - 5 : precipBaseY - 5}
+                                            textAnchor="middle"
+                                            fill={prob > 0 ? "var(--accent-cyan)" : "var(--text-secondary)"}
+                                            fontSize="10"
+                                            fontWeight={prob > 0 ? "bold" : "normal"}
+                                        >
+                                            {prob !== null ? `${prob}%` : '-%'}
+                                        </text>
+                                    </g>
+                                );
+                            })}
 
-                                    const barHeight = (Math.max(prob, 0) / 100) * precipMaxHeight;
-                                    const x = i * itemWidth + itemWidth / 2;
+                            {/* Temperature Line */}
+                            <polyline
+                                fill="none"
+                                stroke="url(#tempGradient)"
+                                strokeWidth="4"
+                                points={points}
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            />
 
-                                    return (
-                                        <g key={`precip-${i}`}>
-                                            {prob > 0 && (
-                                                <rect
-                                                    x={x - 6}
-                                                    y={height - barHeight}
-                                                    width={12}
-                                                    height={barHeight}
-                                                    fill="url(#precipGradient)"
-                                                    rx="2"
-                                                />
-                                            )}
-                                            {/* Show Percentage on ALL bars */}
-                                            {/* If 0%, show at bottom axis */}
-                                            <text
-                                                x={x}
-                                                y={prob > 0 ? height - barHeight - 5 : height - 5}
-                                                textAnchor="middle"
-                                                fill={prob > 0 ? "var(--accent-cyan)" : "var(--text-secondary)"}
-                                                fontSize="10"
-                                                fontWeight={prob > 0 ? "bold" : "normal"}
-                                            >
-                                                {prob !== null ? `${prob}%` : '-%'}
-                                            </text>
-                                        </g>
-                                    );
-                                })}
+                            {/* Points and Temp Labels */}
+                            {hours.map((h, i) => {
+                                const x = horizontalPadding + i * itemWidth + itemWidth / 2;
+                                const y = getY(h.temp);
+                                return (
+                                    <g key={i}>
+                                        <circle cx={x} cy={y} r="4" fill="var(--bg-primary)" stroke="url(#tempGradient)" strokeWidth="2" />
+                                        <text x={x} y={y - 12} textAnchor="middle" fill="var(--text-primary)" fontSize="12" fontWeight="bold">
+                                            {Math.round(h.temp)}°
+                                        </text>
+                                    </g>
+                                );
+                            })}
 
-                                {/* Temperature Line */}
-                                <polyline
-                                    fill="none"
-                                    stroke="url(#tempGradient)"
-                                    strokeWidth="4"
-                                    points={points}
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                />
-
-                                {/* Points and Temp Labels */}
-                                {hours.map((h, i) => {
-                                    const x = i * itemWidth + itemWidth / 2;
-                                    const y = getY(h.temp);
-                                    return (
-                                        <g key={i}>
-                                            <circle cx={x} cy={y} r="4" fill="var(--bg-primary)" stroke="url(#tempGradient)" strokeWidth="2" />
-                                            <text x={x} y={y - 12} textAnchor="middle" fill="var(--text-primary)" fontSize="12" fontWeight="bold">
-                                                {Math.round(h.temp)}°
-                                            </text>
-                                        </g>
-                                    );
-                                })}
-                            </svg>
-                        </div>
-
-                        {/* Row 3: Time Labels */}
-                        <div className="flex w-full h-6 relative mt-4">
-                            {hours.map((h, i) => (
-                                <span
-                                    key={`time-${i}`}
-                                    className="absolute text-xs text-[var(--text-secondary)] text-center transform -translate-x-1/2 min-w-[40px]"
-                                    style={{ left: i * itemWidth + itemWidth / 2 }}
-                                >
-                                    {i === 0 ? 'Now' : formatTime(h.time)}
-                                </span>
-                            ))}
-                        </div>
-
+                            {/* Row 3: Time Labels */}
+                            {hours.map((h, i) => {
+                                const x = horizontalPadding + i * itemWidth + itemWidth / 2;
+                                return (
+                                    <text
+                                        key={`time-${i}`}
+                                        x={x}
+                                        y={height - 10}
+                                        textAnchor="middle"
+                                        fill="var(--text-secondary)"
+                                        fontSize="12"
+                                        fontWeight="500"
+                                    >
+                                        {i === 0 ? t.now : formatTime(h.time)}
+                                    </text>
+                                );
+                            })}
+                        </svg>
                     </div>
                 </div>
             </div>
@@ -303,7 +294,7 @@ const HourlyForecast = ({ hourly }) => {
                         <circle cx="5" cy="6" r="3" fill="var(--bg-primary)" stroke="#3b82f6" strokeWidth="2" />
                         <circle cx="35" cy="6" r="3" fill="var(--bg-primary)" stroke="#ef4444" strokeWidth="2" />
                     </svg>
-                    <span>Temperature</span>
+                    <span>{t.temperature}</span>
                 </div>
                 <div className="legend-item">
                     {/* Visual Bar for Precip */}
@@ -314,7 +305,7 @@ const HourlyForecast = ({ hourly }) => {
                         </linearGradient>
                         <rect x="6" y="0" width="8" height="12" rx="2" fill="url(#legendPrecip)" />
                     </svg>
-                    <span>Precipitation</span>
+                    <span>{t.precipitation}</span>
                 </div>
             </div>
 

@@ -5,7 +5,7 @@ import SettingsModal from './SettingsModal';
 import axios from 'axios';
 
 const Header = () => {
-    const { location, setLocation, theme, effectiveTheme } = useWeather();
+    const { location, setLocation, theme, effectiveTheme, t, language } = useWeather();
     const [showSettings, setShowSettings] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [results, setResults] = useState([]);
@@ -16,7 +16,7 @@ const Header = () => {
         const timer = setTimeout(async () => {
             if (searchQuery.length > 2) {
                 try {
-                    const response = await axios.get(`https://geocoding-api.open-meteo.com/v1/search?name=${searchQuery}&count=5&language=en&format=json`);
+                    const response = await axios.get(`https://geocoding-api.open-meteo.com/v1/search?name=${searchQuery}&count=5&language=${language}&format=json`);
                     setResults(response.data.results || []);
                     setShowResults(true);
                 } catch (error) {
@@ -29,13 +29,13 @@ const Header = () => {
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [searchQuery]);
+    }, [searchQuery, language]);
 
     const handleSelect = (result) => {
         // Format: "City, Country"
         const name = result.name;
         const country = result.country;
-        const cleanName = result.admin1 ? `${name}, ${country}` : `${name}, ${country}`;
+        const cleanName = `${name}, ${country}`;
 
         setLocation({
             lat: result.latitude,
@@ -56,13 +56,25 @@ const Header = () => {
                 const lon = position.coords.longitude;
 
                 try {
-                    // Reverse Geocoding to get City Name
-                    const response = await axios.get(`https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lon}&language=en&format=json`);
-                    const result = response.data.results ? response.data.results[0] : null;
+                    // Reverse Geocoding with OpenStreetMap Nominatim
+                    // Important: Nominatim asks for a valid User-Agent
+                    const response = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&accept-language=${language}`, {
+                        headers: {
+                            'User-Agent': 'WeatherPWA/0.1.4 (github.com/colormint)'
+                        }
+                    });
 
-                    let cleanName = "Current Location";
-                    if (result) {
-                        cleanName = `${result.name}, ${result.country}`;
+                    const address = response.data.address;
+                    let cleanName = t.currentLocation;
+                    if (address) {
+                        // Extract city/town/village to match exact specificity needed
+                        const city = address.city || address.town || address.village || address.municipality || address.county || address.state;
+                        const country = address.country;
+                        if (city && country) {
+                            cleanName = `${city}, ${country}`;
+                        } else if (city) {
+                            cleanName = city;
+                        }
                     }
 
                     setLocation({
@@ -72,11 +84,11 @@ const Header = () => {
                         isGPS: true
                     });
                 } catch (error) {
-                    console.error("Reverse geocoding failed", error);
+                    console.error("Nominatim reverse geocoding failed", error);
                     setLocation({
                         lat: lat,
                         lon: lon,
-                        name: "Current Location",
+                        name: t.currentLocation,
                         isGPS: true
                     });
                 }
@@ -95,13 +107,13 @@ const Header = () => {
                 {/* Row 1: Title and Settings */}
                 <div className="flex w-full justify-between items-center px-1">
                     <h1 className="header-title">
-                        Simple Weather <span className="text-secondary font-medium text-sm">v0.1.3.1</span>
+                        Simple Weather <span className="text-secondary font-medium text-sm">v0.1.4</span>
                     </h1>
                     <div className="flex gap-2">
                         <button
                             onClick={handleGeoLocation}
                             className="icon-btn"
-                            title="Use Current Location"
+                            title={t.currentLocation}
                         >
                             <MapPin size={22} />
                         </button>
@@ -120,7 +132,7 @@ const Header = () => {
                         <Search size={18} className="text-[var(--text-secondary)] flex-shrink-0" />
                         <input
                             type="text"
-                            placeholder="Search for cities"
+                            placeholder={t.searchPrompt}
                             className="header-input"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
@@ -148,19 +160,6 @@ const Header = () => {
                     )}
                 </div>
 
-                {location && (
-                    <div className="w-full flex justify-center items-center mt-4 mb-2">
-                        <span
-                            className="text-xl font-bold text-center tracking-tight"
-                            style={{ color: effectiveTheme === 'dark' ? '#ffffff' : '#000000' }}
-                        >
-                            {location.isGPS
-                                ? (location.name === "Current Location" ? "📍 Current Location" : `📍 ${location.name} (Current Location)`)
-                                : location.name
-                            }
-                        </span>
-                    </div>
-                )}
             </header>
 
             {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}

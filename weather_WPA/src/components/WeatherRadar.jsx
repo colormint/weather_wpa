@@ -71,7 +71,7 @@ const WeatherRadar = () => {
             {/* Map */}
             <MapContainer
                 center={[location.lat, location.lon]}
-                zoom={6}
+                zoom={10}
                 style={{ height: '100%', width: '100%', background: 'transparent' }}
                 zoomControl={false}
                 attributionControl={false}

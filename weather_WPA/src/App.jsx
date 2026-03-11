@@ -119,56 +119,77 @@ function App() {
   return (
     <div className="container">
       {error && error.includes("default location") && (
-        <div className="bg-[var(--accent-yellow)] text-black p-2 text-center text-sm font-bold animate-pulse">
+        <div className="col-span-2 bg-[var(--accent-yellow)] text-black p-2 text-center text-sm font-bold animate-pulse rounded-lg">
           {t.defaultLocationMsg}
         </div>
       )}
-      <Header />
+      
+      <div className="col-span-2 w-full flex flex-col gap-4 min-w-0">
+        <Header />
+        
+        {location && (
+          <div className="w-full flex justify-center items-center">
+            <span className="text-xl font-bold text-center tracking-tight text-[var(--text-primary)]">
+              {location.isGPS
+                ? (location.name === t.currentLocation || location.name === "Current Location" || location.name === "현재 위치"
+                  ? `📍 ${t.currentLocation}`
+                  : `📍 ${location.name} (${t.currentLocation})`)
+                : (location.name === "Seoul (Default)" || location.name === "서울 (기본)"
+                  ? t.seoulDefault
+                  : location.name)
+              }
+            </span>
+          </div>
+        )}
+      </div>
 
-      {location && (
-        <div className="w-full flex justify-center items-center">
-          <span className="text-xl font-bold text-center tracking-tight text-[var(--text-primary)]">
-            {location.isGPS
-              ? (location.name === t.currentLocation || location.name === "Current Location" || location.name === "현재 위치"
-                ? `📍 ${t.currentLocation}`
-                : `📍 ${location.name} (${t.currentLocation})`)
-              : (location.name === "Seoul (Default)" || location.name === "서울 (기본)"
-                ? t.seoulDefault
-                : location.name)
-            }
-          </span>
+      <div className="main-grid">
+        <div className="layout-col-left">
+          <div className="w-full min-w-0 order-1">
+            <CurrentWeather
+              temperature={cw.temperature_2m}
+              weatherCode={cw.weather_code}
+              isDay={cw.is_day}
+              feelsLike={cw.apparent_temperature}
+              high={todayMax}
+              low={todayMin}
+            />
+          </div>
+
+          <div className="w-full min-w-0 order-3">
+            <AirQuality
+              pm10={aqCurrent.pm10}
+              pm25={aqCurrent.pm2_5}
+              timezone={data.weather.timezone}
+            />
+          </div>
+
+          <div className="w-full min-w-0 order-5">
+            <SunCycle
+              sunrise={daily.sunrise[0]}
+              sunset={daily.sunset[0]}
+            />
+          </div>
         </div>
-      )}
 
-      <CurrentWeather
-        temperature={cw.temperature_2m}
-        weatherCode={cw.weather_code}
-        isDay={cw.is_day}
-        feelsLike={cw.apparent_temperature}
-        high={todayMax}
-        low={todayMin}
-      />
+        <div className="layout-col-right">
+          <div className="w-full min-w-0 order-2">
+            <HourlyForecast hourly={hourly} />
+          </div>
 
-      <HourlyForecast hourly={hourly} />
+          <div className="w-full min-w-0 order-4">
+            <WeeklyForecast daily={daily} />
+          </div>
 
-      <AirQuality
-        pm10={aqCurrent.pm10}
-        pm25={aqCurrent.pm2_5}
-        timezone={data.weather.timezone}
-      />
+          <div className="w-full min-w-0 order-6">
+            <WeatherRadar />
+          </div>
+        </div>
+      </div>
 
-      <WeeklyForecast daily={daily} />
-
-      {/* SunCycle Full Width */}
-      <SunCycle
-        sunrise={daily.sunrise[0]}
-        sunset={daily.sunset[0]}
-      />
-
-      <WeatherRadar />
-
-      <footer className="text-center text-mute mt-4 pb-8 text-xs flex flex-col gap-2">
+      <footer className="col-span-2 text-center text-mute mt-4 pb-8 text-xs flex flex-col gap-2">
         <span>Weather data by <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" className="underline font-medium decoration-slice">Open-Meteo.com</a> & <a href="https://www.rainviewer.com/" target="_blank" rel="noopener noreferrer" className="underline font-medium decoration-slice">RainViewer</a></span>
+        <span>Location data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer" className="underline font-medium decoration-slice">OpenStreetMap contributors</a></span>
         <span className="opacity-80">made by <a href="https://github.com/colormint" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--accent-blue)] transition-colors font-semibold">colormint</a></span>
       </footer>
     </div>

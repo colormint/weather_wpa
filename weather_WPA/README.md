@@ -1,11 +1,13 @@
-# Simple Weather PWA (v0.1.4)
+# Simple Weather PWA (v0.1.4.5)
 
 A clean, modern React Native Progressive Web Application that provides incredibly precise, visually elegant weather forecasting.
 
-## v0.1.4 Features & Changes
-This release stabilizes UI, improves graph drawing performance, and fully finalizes i18n support.
+## v0.1.4.5 Features & Changes
+This release stabilizes UI, introduces responsive desktop grid structures, adds compliance attributions, and fully finalizes i18n support.
 
 ### Features
+* **Responsive Layout:** The application now dynamically restructures from a linear mobile flow to a beautiful 2-column grid layout on tablets and desktop monitors.
+* **Compliance:** Explicitly added OpenStreetMap (OSM) attribution hyperlinks in the footer to abide by ODbL licensing rules for Reverse Geocoding.
 * **Perfectly Aligned Graphs:** The 24-hour forecast container was entirely rewritten to use absolute SVG coordinate mapping ensuring perfect icon-to-gridline visual alignment. Both temperature lines and precipitation bars render dynamically with custom boundaries.
 * **Korean Localization (ko-KR):** Fully translated UI strings including:
   * "H" / "L" vs "최고" / "최저" in daily forecast

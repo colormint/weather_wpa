@@ -85,7 +85,7 @@ export const WeatherProvider = ({ children }) => {
 
     const [location, setLocation] = useState(() => {
         try {
-            const saved = localStorage.getItem('weather-location');
+            const saved = sessionStorage.getItem('weather-location');
             return saved ? JSON.parse(saved) : null;
         } catch (e) {
             return null;
@@ -102,8 +102,17 @@ export const WeatherProvider = ({ children }) => {
     useEffect(() => { localStorage.setItem('weather-time-format', timeFormat); }, [timeFormat]);
     useEffect(() => { localStorage.setItem('weather-language', language); }, [language]);
     useEffect(() => {
-        if (location) localStorage.setItem('weather-location', JSON.stringify(location));
+        if (location) sessionStorage.setItem('weather-location', JSON.stringify(location));
     }, [location]);
+
+    // Clean up legacy localStorage geolocation key if it exists
+    useEffect(() => {
+        try {
+            localStorage.removeItem('weather-location');
+        } catch (e) {
+            console.error("Failed to clean legacy localStorage", e);
+        }
+    }, []);
 
     // Resolve Theme
     useEffect(() => {

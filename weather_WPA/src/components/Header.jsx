@@ -38,8 +38,8 @@ const Header = () => {
         const cleanName = `${name}, ${country}`;
 
         setLocation({
-            lat: result.latitude,
-            lon: result.longitude,
+            lat: Math.round(result.latitude * 100) / 100,
+            lon: Math.round(result.longitude * 100) / 100,
             name: cleanName,
             country: result.country,
             isGPS: false
@@ -52,8 +52,8 @@ const Header = () => {
         setSearchQuery('');
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(async (position) => {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
+                const lat = Math.round(position.coords.latitude * 100) / 100;
+                const lon = Math.round(position.coords.longitude * 100) / 100;
 
                 try {
                     // Reverse Geocoding with OpenStreetMap Nominatim

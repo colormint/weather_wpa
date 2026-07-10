@@ -37,7 +37,7 @@ const translations = {
         seoulDefault: "서울 (기본)",
         defaultLocationMsg: "기본 위치(서울)를 사용 중입니다. 검색하여 도시를 찾아보세요.",
         temperature: "온도",
-        precipitation: "강수량"
+        precipitation: "강수 확률"
     },
     en: {
         settings: "Settings",
@@ -70,7 +70,7 @@ const translations = {
         seoulDefault: "Seoul (Default)",
         defaultLocationMsg: "Using default location (Seoul). Tap Search to find your city.",
         temperature: "Temperature",
-        precipitation: "Precipitation"
+        precipitation: "Chance of rain"
     }
 };
 

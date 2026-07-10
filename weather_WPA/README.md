@@ -1,22 +1,15 @@
-# Simple Weather PWA (v0.1.4.5)
+# Simple Weather PWA (v0.1.4.6)
 
-A clean, modern React Native Progressive Web Application that provides incredibly precise, visually elegant weather forecasting.
+A clean, modern React Progressive Web Application that provides incredibly precise, visually elegant weather forecasting.
 
-## v0.1.4.5 Features & Changes
-This release stabilizes UI, introduces responsive desktop grid structures, adds compliance attributions, and fully finalizes i18n support.
+## v0.1.4.6 Features & Changes
+This release restores the weather radar layer by adapting to RainViewer's updated hash-based path API, implements coordinate rounding for geolocation privacy, and migrates location caching to session storage.
 
-### Features
-* **Responsive Layout:** The application now dynamically restructures from a linear mobile flow to a beautiful 2-column grid layout on tablets and desktop monitors.
-* **Compliance:** Explicitly added OpenStreetMap (OSM) attribution hyperlinks in the footer to abide by ODbL licensing rules for Reverse Geocoding.
-* **Perfectly Aligned Graphs:** The 24-hour forecast container was entirely rewritten to use absolute SVG coordinate mapping ensuring perfect icon-to-gridline visual alignment. Both temperature lines and precipitation bars render dynamically with custom boundaries.
-* **Korean Localization (ko-KR):** Fully translated UI strings including:
-  * "H" / "L" vs "최고" / "최저" in daily forecast
-  * Mapped AM/PM standardizations per locale
-  * Translated Open-Meteo weather codes
-* **Dynamic Air Quality Indices (AQI):** The application intelligently switches between United States EPA and European EAQI air quality standard thresholds dynamically based upon the user's current loaded timezone.
-* **Unified Gradient System:** Both the Hourly Forecast wave graph and textual averages (like the 7-day card and overview) dynamically invoke a unified temperature-to-color interpolation tool, shifting from icy blue (< -10°C) up to red (> 40°C).
-* **Robust Settings:** Time format toggle is strictly limited to user preference (12h vs 24h), migrating cleanly from older "Auto" variants.
-* **Radar Module Baseline:** Default tracking view initialized to city-bounds.
+### Features & Fixes
+* **Weather Radar Fix:** Updated tile layer requests to fetch active paths and hosts dynamically from the RainViewer API, resolving issues from hardcoded defunct domains and timestamp API deprecations.
+* **Smart Zoom Scaling:** Configured max Native Zoom to 7 for radar tiles, allowing the Leaflet map to stretch tiles smoothly up to level 18 without breaking detail levels.
+* **Geolocation Privacy:** Implemented 2 decimal place coordinate rounding (~1.1km area precision) before querying third-party APIs to mask precise home/building addresses.
+* **Storage Migration:** Moved geolocation cache from localStorage to sessionStorage so location data is completely purged when the browser tab is closed. Added automatic legacy localStorage key cleanup.
 
 ## Setup
 Built via Vite. 

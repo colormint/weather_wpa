@@ -60,7 +60,7 @@ const Header = () => {
                     // Important: Nominatim asks for a valid User-Agent
                     const response = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&accept-language=${language}`, {
                         headers: {
-                            'User-Agent': 'WeatherPWA/0.1.4 (github.com/colormint)'
+                            'User-Agent': 'WeatherPWA/0.1.4.6 (github.com/colormint)'
                         }
                     });
 
@@ -107,7 +107,7 @@ const Header = () => {
                 {/* Row 1: Title and Settings */}
                 <div className="flex w-full justify-between items-center px-1">
                     <h1 className="header-title">
-                        Simple Weather <span className="text-secondary font-medium text-sm">v0.1.4.5</span>
+                        Simple Weather <span className="text-secondary font-medium text-sm">v0.1.4.6</span>
                     </h1>
                     <div className="flex gap-2">
                         <button

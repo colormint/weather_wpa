@@ -13,8 +13,8 @@ function MapUpdater({ center }) {
 
 const WeatherRadar = () => {
     const { location, effectiveTheme } = useWeather();
-    const [radarTs, setRadarTs] = useState(null);
-    const [satelliteTs, setSatelliteTs] = useState(null);
+    const [radarHost, setRadarHost] = useState('https://tilecache.rainviewer.com');
+    const [radarPath, setRadarPath] = useState(null);
 
     useEffect(() => {
         const fetchRadar = async () => {
@@ -22,17 +22,15 @@ const WeatherRadar = () => {
                 const res = await fetch('https://api.rainviewer.com/public/weather-maps.json');
                 const data = await res.json();
 
+                // Dynamic Host
+                if (data?.host) {
+                    setRadarHost(data.host);
+                }
+
                 // Radar (Precipitation)
                 if (data?.radar?.past?.length > 0) {
                     const latest = data.radar.past[data.radar.past.length - 1];
-                    setRadarTs(latest.time);
-                }
-
-                // Satellite (Clouds) - Infrared
-                // Note: often empty on free tier or certain regions
-                if (data?.satellite?.infrared?.length > 0) {
-                    const latestSat = data.satellite.infrared[data.satellite.infrared.length - 1];
-                    setSatelliteTs(latestSat.time);
+                    setRadarPath(latest.path);
                 }
             } catch (err) {
                 console.error("Radar fetch error:", err);
@@ -72,26 +70,21 @@ const WeatherRadar = () => {
             <MapContainer
                 center={[location.lat, location.lon]}
                 zoom={10}
+                maxZoom={18}
                 style={{ height: '100%', width: '100%', background: 'transparent' }}
                 zoomControl={false}
                 attributionControl={false}
             >
                 {/* Base Map */}
-                <TileLayer url={tileLayerUrl} />
-
-                {/* Satellite Layer (Clouds) - Fallback if available */}
-                {satelliteTs && (
-                    <TileLayer
-                        url={`https://tile.cache.rainviewer.com/v2/satellite-infrared/${satelliteTs}/256/{z}/{x}/{y}/0/1_1.png`}
-                        opacity={0.5}
-                    />
-                )}
+                <TileLayer url={tileLayerUrl} maxZoom={18} />
 
                 {/* Radar Layer (Precipitation) */}
-                {radarTs && (
+                {radarPath && (
                     <TileLayer
-                        url={`https://tile.cache.rainviewer.com/v2/radar/${radarTs}/256/{z}/{x}/{y}/2/1_1.png`}
+                        url={`${radarHost}${radarPath}/256/{z}/{x}/{y}/2/1_1.png`}
                         opacity={0.8}
+                        maxNativeZoom={7}
+                        maxZoom={18}
                     />
                 )}
 

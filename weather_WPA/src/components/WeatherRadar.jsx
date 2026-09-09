@@ -44,9 +44,7 @@ const WeatherRadar = () => {
     if (!location) return null;
 
     const isDark = effectiveTheme === 'dark';
-    const tileLayerUrl = isDark
-        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-        : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+    const tileLayerUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
     // Explicit style to ensure visibility and match theme
     const containerStyle = {
@@ -76,7 +74,11 @@ const WeatherRadar = () => {
                 attributionControl={false}
             >
                 {/* Base Map */}
-                <TileLayer url={tileLayerUrl} maxZoom={18} />
+                <TileLayer
+                    url={tileLayerUrl}
+                    className={isDark ? 'base-map-tiles base-map-tiles--dark' : 'base-map-tiles'}
+                    maxZoom={18}
+                />
 
                 {/* Radar Layer (Precipitation) */}
                 {radarPath && (
@@ -121,7 +123,7 @@ const WeatherRadar = () => {
                 color: '#000',
                 pointerEvents: 'none'
             }}>
-                RainViewer | OSM
+                RainViewer | © OpenStreetMap
             </div>
         </div>
     );

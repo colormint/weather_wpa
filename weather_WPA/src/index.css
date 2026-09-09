@@ -361,6 +361,14 @@ h3 {
   z-index: 1;
 }
 
+.base-map-tiles {
+  transition: filter 0.2s ease;
+}
+
+.base-map-tiles--dark {
+  filter: brightness(0.6) invert(1) contrast(1.8) hue-rotate(180deg) saturate(0.45) brightness(0.8);
+}
+
 .radar-badge {
   position: absolute;
   top: 10px;

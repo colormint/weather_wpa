@@ -5,7 +5,7 @@ import SettingsModal from './SettingsModal';
 import axios from 'axios';
 
 const Header = () => {
-    const { location, setLocation, theme, effectiveTheme, t, language } = useWeather();
+    const { setLocation, t, language } = useWeather();
     const [showSettings, setShowSettings] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [results, setResults] = useState([]);
@@ -16,7 +16,7 @@ const Header = () => {
         const timer = setTimeout(async () => {
             if (searchQuery.length > 2) {
                 try {
-                    const response = await axios.get(`https://geocoding-api.open-meteo.com/v1/search?name=${searchQuery}&count=5&language=${language}&format=json`);
+                    const response = await axios.get(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(searchQuery)}&count=5&language=${language}&format=json`);
                     setResults(response.data.results || []);
                     setShowResults(true);
                 } catch (error) {
@@ -57,12 +57,8 @@ const Header = () => {
 
                 try {
                     // Reverse Geocoding with OpenStreetMap Nominatim
-                    // Important: Nominatim asks for a valid User-Agent
-                    const response = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&accept-language=${language}`, {
-                        headers: {
-                            'User-Agent': 'WeatherPWA/0.1.4.6 (github.com/colormint)'
-                        }
-                    });
+                    // Note: Browser XHR/Fetch forbids setting custom User-Agent headers
+                    const response = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&accept-language=${language}`);
 
                     const address = response.data.address;
                     let cleanName = t.currentLocation;

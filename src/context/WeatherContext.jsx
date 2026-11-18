@@ -93,7 +93,6 @@ export const WeatherProvider = ({ children }) => {
     });
 
     const [effectiveTheme, setEffectiveTheme] = useState('light');
-    const [effectiveUnits, setEffectiveUnits] = useState('metric');
     const [effectiveTimeFormat, setEffectiveTimeFormat] = useState('24h');
 
     // Persist settings
@@ -139,14 +138,13 @@ export const WeatherProvider = ({ children }) => {
     }, [theme]);
 
     // Resolve Units
-    useEffect(() => {
+    const effectiveUnits = useMemo(() => {
         if (units === 'auto') {
             const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
             const isImperial = tz.startsWith('America/') || tz === 'Europe/London';
-            setEffectiveUnits(isImperial ? 'imperial' : 'metric');
-        } else {
-            setEffectiveUnits(units);
+            return isImperial ? 'imperial' : 'metric';
         }
+        return units;
     }, [units]);
 
     // Resolve Time Format

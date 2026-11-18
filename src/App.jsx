@@ -11,7 +11,7 @@ import WeatherRadar from './components/WeatherRadar';
 import { Loader2, AlertCircle } from 'lucide-react';
 
 function App() {
-  const { location, setLocation, units, t } = useWeather();
+  const { location, setLocation, effectiveUnits, t } = useWeather();
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -36,7 +36,7 @@ function App() {
           name: t.currentLocation
         });
       },
-      (err) => {
+      () => {
         console.warn("Geolocation failed, falling back to Seoul");
         setLocation(SEOUL);
         setError("Location access denied. Using default location.");
@@ -53,7 +53,7 @@ function App() {
         setLoading(true);
         setError(null);
 
-        const unitParam = units === 'imperial' ? '&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch' : '';
+        const unitParam = effectiveUnits === 'imperial' ? '&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch' : '';
 
         // API 1: Weather (Expanded for Forecasts)
         // hourly: temp, code
@@ -81,7 +81,7 @@ function App() {
     };
 
     fetchData();
-  }, [location, units]);
+  }, [location, effectiveUnits]);
 
   if (!location && loading) {
     return (
@@ -109,7 +109,7 @@ function App() {
 
   if (!data) return null;
 
-  const { current: cw, minutely_15: min15, hourly, daily } = data.weather;
+  const { current: cw, hourly, daily } = data.weather;
   const { current: aqCurrent } = data.aq;
 
   // Preparing data for today's high/low

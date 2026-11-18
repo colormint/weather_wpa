@@ -5,7 +5,7 @@ import { useWeather } from '../context/WeatherContext';
 import { getTempGradientStyle } from '../utils/colors';
 
 const DailyCard = ({ day }) => {
-    const { t, language } = useWeather();
+    const { t, language, effectiveUnits } = useWeather();
     const date = new Date(day.time);
     const locale = language === 'ko' ? ko : enUS;
     const dayName = format(date, 'EEEE', { locale });
@@ -54,7 +54,7 @@ const DailyCard = ({ day }) => {
                 <div className="text-7xl filter drop-shadow-sm mb-2">
                     {getIcon(day.code)}
                 </div>
-                <span className="text-5xl font-extrabold weather-temp tracking-tighter" style={getTempGradientStyle(Math.round((day.max + day.min) / 2))}>
+                <span className="text-5xl font-extrabold weather-temp tracking-tighter" style={getTempGradientStyle(Math.round((day.max + day.min) / 2), effectiveUnits)}>
                     {Math.round((day.max + day.min) / 2)}°
                 </span>
                 <span className="text-base font-bold text-[var(--text-secondary)]">

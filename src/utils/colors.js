@@ -7,6 +7,16 @@ export const tempStops = [
     { t: 40, c: '#ef4444' }   // Red
 ];
 
+const toCelsius = (temp, units = 'metric') => (
+    units === 'imperial' ? ((temp - 32) * 5) / 9 : temp
+);
+
+export const getTempStops = (units = 'metric') => (
+    units === 'imperial'
+        ? tempStops.map((stop) => ({ ...stop, t: (stop.t * 9) / 5 + 32 }))
+        : tempStops
+);
+
 const hexToRgb = (hex) => {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
@@ -14,15 +24,17 @@ const hexToRgb = (hex) => {
     return [r, g, b];
 };
 
-export const getTempColor = (temp) => {
-    if (temp <= tempStops[0].t) return tempStops[0].c;
-    if (temp >= tempStops[tempStops.length - 1].t) return tempStops[tempStops.length - 1].c;
+export const getTempColor = (temp, units = 'metric') => {
+    const celsius = toCelsius(temp, units);
+
+    if (celsius <= tempStops[0].t) return tempStops[0].c;
+    if (celsius >= tempStops[tempStops.length - 1].t) return tempStops[tempStops.length - 1].c;
 
     for (let i = 0; i < tempStops.length - 1; i++) {
         const lower = tempStops[i];
         const upper = tempStops[i + 1];
-        if (temp >= lower.t && temp <= upper.t) {
-            const ratio = (temp - lower.t) / (upper.t - lower.t);
+        if (celsius >= lower.t && celsius <= upper.t) {
+            const ratio = (celsius - lower.t) / (upper.t - lower.t);
             const rgb1 = hexToRgb(lower.c);
             const rgb2 = hexToRgb(upper.c);
 
@@ -35,9 +47,10 @@ export const getTempColor = (temp) => {
     return tempStops[0].c;
 };
 
-export const getTempGradientStyle = (temp) => {
-    const topColor = getTempColor(temp + 2);
-    const bottomColor = getTempColor(temp - 4);
+export const getTempGradientStyle = (temp, units = 'metric') => {
+    const celsius = toCelsius(temp, units);
+    const topColor = getTempColor(celsius + 2);
+    const bottomColor = getTempColor(celsius - 4);
     return {
         backgroundImage: `linear-gradient(to bottom, ${topColor}, ${bottomColor})`,
         WebkitBackgroundClip: 'text',

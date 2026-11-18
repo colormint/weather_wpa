@@ -46,7 +46,7 @@ const getWeatherIcon = (code, isDay) => {
 };
 
 const CurrentWeather = ({ temperature, weatherCode, isDay, feelsLike, high, low }) => {
-    const { t, language } = useWeather();
+    const { t, language, effectiveUnits } = useWeather();
     return (
         <div className="w-full">
             <div className="card current-weather flex flex-col items-center">
@@ -57,7 +57,7 @@ const CurrentWeather = ({ temperature, weatherCode, isDay, feelsLike, high, low 
                     {getWeatherIcon(weatherCode, isDay)}
                 </div>
                 <div className="flex flex-col items-center">
-                    <h1 className="weather-temp" style={getTempGradientStyle(Math.round(temperature))}>
+                    <h1 className="weather-temp" style={getTempGradientStyle(Math.round(temperature), effectiveUnits)}>
                         {Math.round(temperature)}°
                     </h1>
                     <p className="weather-desc">

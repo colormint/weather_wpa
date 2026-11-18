@@ -2,21 +2,21 @@ import React from 'react';
 import { format } from 'date-fns';
 import { ko, enUS } from 'date-fns/locale';
 import { useWeather } from '../context/WeatherContext';
-import { tempStops } from '../utils/colors';
+import { getTempStops } from '../utils/colors';
 
 const HourlyForecast = ({ hourly }) => {
-    const { timeFormat, t, language } = useWeather();
+    const { timeFormat, effectiveUnits, t, language } = useWeather();
 
     if (!hourly) return null;
 
     // Find Current Hour Index
-    const now = new Date();
+    const currentHourMs = new Date().setMinutes(0, 0, 0);
     // API times are ISO. We find the first time that is >= current hour (ignoring minutes/seconds for the "current" slot, or just find nearest)
     // Actually, simple string comparison or Date object works.
     // Let's find the index where the hour matches current hour.
     const currentHourIndex = hourly.time.findIndex(t => {
         const timeDate = new Date(t);
-        return timeDate.getTime() >= now.setMinutes(0, 0, 0); // Compare with current hour:00
+        return timeDate.getTime() >= currentHourMs; // Compare with current hour:00
     });
 
     // Fallback to 0 if not found (shouldn't happen with proper API data)
@@ -69,8 +69,9 @@ const HourlyForecast = ({ hourly }) => {
         return tempGraphBottom - ((temp - minTemp) / tempRange) * (tempGraphBottom - tempGraphTop);
     };
 
-    // Calculate Y for 0 degrees (Reference Line)
-    const yZero = getY(0);
+    // Calculate Y for freezing point (0°C / 32°F Reference Line)
+    const freezingTemp = effectiveUnits === 'imperial' ? 32 : 0;
+    const yZero = getY(freezingTemp);
     const showZeroLine = yZero >= tempGraphTop && yZero <= tempGraphBottom;
 
     // SVG Points
@@ -122,7 +123,7 @@ const HourlyForecast = ({ hourly }) => {
     };
 
     // We need to map these temps to % positions in the gradient.
-    const gradientStops = tempStops.map(s => {
+    const gradientStops = getTempStops(effectiveUnits).map(s => {
         let offset = (s.t - minTemp) / (maxTemp - minTemp);
         // Clamp offset to 0-1
         if (offset < 0) offset = 0;

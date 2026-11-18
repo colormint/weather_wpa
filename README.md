@@ -1,4 +1,4 @@
-# Simple Weather PWA (v0.1.4.6)
+# Simple Weather PWA (v0.1.4.7)
 
 A simple weather PWA built to work across phones, tablets, and desktops.
 

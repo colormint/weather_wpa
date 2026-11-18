@@ -103,7 +103,7 @@ const Header = () => {
                 {/* Row 1: Title and Settings */}
                 <div className="flex w-full justify-between items-center px-1">
                     <h1 className="header-title">
-                        Simple Weather <span className="text-secondary font-medium text-sm">v0.1.4.6</span>
+                        Simple Weather <span className="text-secondary font-medium text-sm">v0.1.4.7</span>
                     </h1>
                     <div className="flex gap-2">
                         <button

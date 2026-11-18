@@ -1,5 +1,4 @@
 import React from 'react';
-import { Cloud, Sun, CloudRain, CloudSnow, CloudLightning, CloudDrizzle, CloudFog } from 'lucide-react';
 import { useWeather } from '../context/WeatherContext';
 import { getTempGradientStyle } from '../utils/colors';
 
@@ -31,8 +30,6 @@ const getWeatherIcon = (code, isDay) => {
     // 61, 63, 65: Rain
     // 71, 73, 75: Snow
     // 95, 96, 99: Thunderstorm
-
-    const iconProps = { size: 64, className: "text-current" };
 
     if (code === 0) return isDay ? "☀️" : "🌙";
     if (code >= 1 && code <= 3) return isDay ? "⛅" : "☁️";
